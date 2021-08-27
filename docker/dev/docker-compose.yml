@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+    makeplantuml-dev:
+        image: golang:1.16.1
+        container_name: makeplantuml-dev
+        volumes:
+            - "../../:/home/makeplantuml/container:rw"
+        hostname: makeplantuml-dev
+        command: /bin/sh -c "while :; do sleep 10; done"
