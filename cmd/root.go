@@ -4,6 +4,7 @@ import (
 	"os"
 	"fmt"
 	"github.com/spf13/cobra"
+	"local.packages/makeplantuml"
 )
 
 type params struct {
@@ -43,6 +44,12 @@ func init() {
 			fmt.Println("version: 2.0.0")
 			os.Exit(0)
 		}
-		return rootCmd.Help()
+
+		if len(args) > 5 {
+			return rootCmd.Help()
+		}
+
+		makeplantuml.RunTshark()
+		return nil
 	}
 }
