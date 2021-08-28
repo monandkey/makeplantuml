@@ -1,12 +1,95 @@
 package makeplantuml
 
 import (
+	"os"
 	"fmt"
+	"strings"
+	"runtime"
 	"os/exec"
+	"encoding/csv"
 )
 
+type tsharkHeader struct {
+	number   string
+	time     string
+	srcAddr  ipAddr
+	srcPort  portNumber
+	dstAddr  ipAddr
+	dstPort  portNumber
+	protocol string
+	message  string
+	checksum checksumProtocol
+}
+
+type ipAddr struct {
+	v4Addr string
+	v6Addr string
+}
+
+type portNumber struct {
+	udpPort  string
+	tcpPort  string
+	sctpPort string
+}
+
+type checksumProtocol struct {
+	udpChecksum  string
+	tcpChecksum  string
+	sctpChecksum string
+}
+
+func (t tsharkHeader) setHeader(out string) {
+	arr := strings.Split(out, "\n")
+	for _, v := range arr {
+		arr2 := strings.Split(v, ",")
+		t.number                = arr2[0]
+		t.time                  = arr2[1]
+		t.srcAddr.v4Addr        = arr2[2]
+		t.srcAddr.v6Addr        = arr2[3]
+		t.srcPort.udpPort       = arr2[4]
+		t.srcPort.tcpPort       = arr2[5]
+		t.srcPort.sctpPort      = arr2[6]
+		t.dstAddr.v4Addr        = arr2[7]
+		t.dstAddr.v6Addr        = arr2[8]
+		t.dstPort.udpPort       = arr2[9]
+		t.dstPort.tcpPort       = arr2[10]
+		t.dstPort.sctpPort      = arr2[11]
+		t.protocol              = arr2[12]
+		t.message               = arr2[13]
+		t.checksum.udpChecksum  = arr2[14]
+		t.checksum.tcpChecksum  = arr2[15]
+		t.checksum.sctpChecksum = arr2[16]
+	}
+}
+
+func createCSV(out string) (string, error) {
+	csvFile := ".tmp.csv"
+	file, err := os.OpenFile(csvFile, os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return csvFile, err
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	writer.Write([]string{out})
+	writer.Flush()
+
+	return csvFile, nil
+}
+
 func RunTshark() {
-	out, err := exec.Command("tshark",
+	var cmd string
+	switch(runtime.GOOS) {
+		case "windows":
+			cmd = "C:/Program Files/Wireshark-3.2.3/tshark.exe"
+		case "linux":
+			cmd = "tshark"
+		default:
+			fmt.Println("Your OS not support.")
+			return
+	}
+
+	out, err := exec.Command(cmd,
 		"-r", "./sample/3g_4g_nokia.pcap",
 		"-t", "ad",
 		"-T", "fields",
@@ -29,11 +112,17 @@ func RunTshark() {
 		"-e", "udp.checksum",
 		"-e", "sctp.checksum",
 		"-e", "tcp.checksum",
-		).Output()
+	).Output()
 
 	if err != nil {
+		fmt.Println(os.Stderr, err)
 		return
 	}
 
-	fmt.Println(string(out))
+	csv, err := createCSV(string(out))
+	if err != nil {
+		fmt.Println("Error")
+		return
+	}
+	fmt.Println(csv)
 }

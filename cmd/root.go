@@ -8,10 +8,11 @@ import (
 )
 
 type params struct {
-	version bool
-	fileName string
-	timeStamp bool
-	pumlConvert bool
+	version            bool
+	fileName           string
+	timeStamp          bool
+	pumlConvert        bool
+	packetOptimization bool
 }
 
 var rootCmd = &cobra.Command{}
@@ -28,16 +29,18 @@ func init() {
 	rootCmd.Short = "PCAP to PlantUML to PNG converter"
 
 	params := params{
-		version:     false,
-		fileName:    "",
-		timeStamp:   false,
-		pumlConvert: false,
+		version:            false,
+		fileName:           "",
+		timeStamp:          false,
+		pumlConvert:        false,
+		packetOptimization: false,
 	}
 
-	rootCmd.Flags().BoolVarP(&params.version, "version", "v", false, "display version")
+	rootCmd.Flags().BoolVarP(&params.version, "version", "v", params.version, "display version")
 	rootCmd.Flags().StringVarP(&params.fileName, "filename", "f", params.fileName, "")
-	rootCmd.Flags().BoolVarP(&params.timeStamp, "timestamp", "t", false, "")
-	rootCmd.Flags().BoolVarP(&params.pumlConvert, "puml-convert", "p", false, "")
+	rootCmd.Flags().BoolVarP(&params.timeStamp, "timestamp", "t", params.timeStamp, "")
+	rootCmd.Flags().BoolVarP(&params.pumlConvert, "puml-convert", "p", params.pumlConvert, "")
+	rootCmd.Flags().BoolVar(&params.packetOptimization, "packet-optimization",     params.packetOptimization, "")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.version {
