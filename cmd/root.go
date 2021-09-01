@@ -52,7 +52,8 @@ func init() {
 			return rootCmd.Help()
 		}
 
-		fmt.Println(makeplantuml.RunTshark())
+		// fmt.Println(makeplantuml.RunTshark())
+		makeplantuml.CreateTemplate()
 		return nil
 	}
 }
