@@ -52,7 +52,7 @@ func init() {
 			return rootCmd.Help()
 		}
 
-		makeplantuml.RunTshark()
+		fmt.Println(makeplantuml.RunTshark())
 		return nil
 	}
 }
