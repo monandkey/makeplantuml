@@ -52,8 +52,10 @@ func init() {
 			return rootCmd.Help()
 		}
 
-		// fmt.Println(makeplantuml.RunTshark())
-		makeplantuml.CreateTemplate()
+		t := makeplantuml.RunTshark()
+		// makeplantuml.CreateTemplate()
+		makeplantuml.NameResolution(t)
+		fmt.Println(t)
 		return nil
 	}
 }
