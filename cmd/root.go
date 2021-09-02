@@ -4,13 +4,14 @@ import (
 	"os"
 	"fmt"
 	"github.com/spf13/cobra"
+	"local.packages/makeplantuml"
 )
 
 type params struct {
-	version bool
-	fileName string
+	version   bool
+	fileName  string
 	timeStamp bool
-	pumlConvert bool
+	title     string
 }
 
 var rootCmd = &cobra.Command{}
@@ -27,22 +28,32 @@ func init() {
 	rootCmd.Short = "PCAP to PlantUML to PNG converter"
 
 	params := params{
-		version:     false,
-		fileName:    "",
-		timeStamp:   false,
-		pumlConvert: false,
+		version:   false,
+		fileName:  "",
+		timeStamp: false,
+		title:     "",
 	}
 
-	rootCmd.Flags().BoolVarP(&params.version, "version", "v", false, "display version")
+	rootCmd.Flags().BoolVarP(&params.version, "version", "v", params.version, "display version")
 	rootCmd.Flags().StringVarP(&params.fileName, "filename", "f", params.fileName, "")
-	rootCmd.Flags().BoolVarP(&params.timeStamp, "timestamp", "t", false, "")
-	rootCmd.Flags().BoolVarP(&params.pumlConvert, "puml-convert", "p", false, "")
+	rootCmd.Flags().BoolVarP(&params.timeStamp, "timestamp", "t", params.timeStamp, "")
+	rootCmd.Flags().StringVar(&params.title, "puml-title", params.title, "Give PUML a title.")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.version {
 			fmt.Println("version: 2.0.0")
 			os.Exit(0)
 		}
-		return rootCmd.Help()
+
+		if params.fileName == "" {
+			return rootCmd.Help()
+		}
+
+		t := makeplantuml.RunTshark(params.fileName)
+		makeplantuml.CreateTemplate(params.title)
+		makeplantuml.NameResolution(t)
+		makeplantuml.WriteUml(t, params.timeStamp)
+		makeplantuml.RenderingUml()
+		return nil
 	}
 }
