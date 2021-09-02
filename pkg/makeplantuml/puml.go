@@ -15,7 +15,7 @@ var outLocation = location{
 	path: "./result",
 }
 
-func CreateTemplate() {
+func CreateTemplate(t string) {
 	if pumlLocation.validateLocation() {
 		err := os.Mkdir(pumlLocation.path, 0777)
 		if err != nil {
@@ -33,8 +33,16 @@ func CreateTemplate() {
 	file.Write(([]byte)("@startuml\n"))
 	file.Write(([]byte)("skinparam Monochrome true\n"))
 	file.Write(([]byte)("skinparam shadowing false\n"))
+	file.Write(([]byte)("skinparam defaultFontName Courier\n"))
 	file.Write(([]byte)("hide footbox\n"))
-	file.Write(([]byte)("title xxxxxxxx\n"))
+
+	if t != "" {
+		file.Write(([]byte)("title " + t +"\n"))
+
+	} else {
+		file.Write(([]byte)("title \"\"\n"))
+	}
+
 	file.Write(([]byte)("skinparam note {\n"))
 	file.Write(([]byte)("	BackgroundColor white\n"))
 	file.Write(([]byte)("	BorderColor white\n"))
