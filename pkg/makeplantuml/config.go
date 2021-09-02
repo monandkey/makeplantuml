@@ -9,18 +9,24 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var config = getConfigParameter()
+
 type profile struct {
+	Profile profiles `yaml:"profile`
+}
+
+type profiles struct {
 	Path    path    `yaml:"path"`
 	Feature feature `yaml:"feature"`
 }
 
 type path struct {
 	Java      string `yaml:"java"`
-	Wireshark bool   `yaml:"wireshark"`
+	Wireshark string `yaml:"wireshark"`
 }
 
 type feature struct {
-	Timestamp      int    `yaml:"timestamp"`
+	Timestamp      string `yaml:"timestamp"`
 	NameResolution string `yaml:"nameResolution"`
 }
 
@@ -44,6 +50,15 @@ type disassembledCharacter struct {
 func (d disassembledCharacter) stringJoin() configPath {
 	c := configPath{path: d.homedir + d.separate + d.filename}
 	return c
+}
+
+func getConfigParameter() profile {
+	ds := disassembledCharacter{
+		homedir:  getHomedir(),
+		separate: getSeparate(),
+		filename: getConfigName(),
+	}
+	return ds.stringJoin().configLoad()
 }
 
 func getHomedir() string {

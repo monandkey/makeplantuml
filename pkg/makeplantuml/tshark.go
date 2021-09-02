@@ -9,14 +9,19 @@ import (
 
 func RunTshark(fileName string) tsharkHeaders {
 	var cmd string
-	switch(runtime.GOOS) {
-		case "windows":
-			cmd = "C:/Program Files/Wireshark-3.2.3/tshark.exe"
-		case "linux":
-			cmd = "tshark"
-		default:
-			fmt.Println("Your OS not support.")
-			os.Exit(0)
+	if config.Profile.Path.Wireshark == "default" {
+		switch(runtime.GOOS) {
+			case "windows":
+				cmd = "C:/Program Files/Wireshark/tshark.exe"
+			case "linux":
+				cmd = "tshark"
+			default:
+				fmt.Println("Your OS not support.")
+				os.Exit(0)
+		}
+
+	} else {
+		cmd = config.Profile.Path.Wireshark + "\\tshark.exe"
 	}
 
 	out, err := exec.Command(cmd,

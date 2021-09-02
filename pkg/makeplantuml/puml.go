@@ -74,14 +74,19 @@ func WriteUml(t tsharkHeaders, tf bool) {
 
 func RenderingUml() {
 	var cmd string
-	switch(runtime.GOOS) {
-		case "windows":
-			cmd = "java"
-		case "linux":
-			cmd = "java"
-		default:
-			fmt.Println("Your OS not support.")
-			os.Exit(0)
+	if config.Profile.Path.Java == "default" {
+		switch(runtime.GOOS) {
+			case "windows":
+				cmd = "java"
+			case "linux":
+				cmd = "java"
+			default:
+				fmt.Println("Your OS not support.")
+				os.Exit(0)
+		}
+
+		} else {
+		cmd = config.Profile.Path.Java
 	}
 
 	if outLocation.validateLocation() {

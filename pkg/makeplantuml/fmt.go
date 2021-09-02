@@ -103,27 +103,43 @@ func (t tsharkHeaders) setHeader(out string) tsharkHeaders {
 	return t
 }
 
-func hostInfoFormating(h string) [][]string {
+func hostInfoFormating(h string) []map[string]string {
 	h = regexp.MustCompile("\r\n").ReplaceAllString(h, "\n")
 	lines := strings.Split(h, "\n")
 
-	var hosts [][]string
+	var hosts []map[string]string
 	for _, line := range lines {
 		if regexp.MustCompile("^;").Match([]byte(line)) {
 			continue
 		}
 
 		column := strings.Split(line, " ")
-		
+
 		if len(column) <= 1 {
 			continue
 		}
 
-		if len(column) < 3 {
+		for len(column) <= 4 {
 			column = append(column, "")
 		}
 
-		hosts = append(hosts, [][]string{column}...)
+		if regexp.MustCompile("[a-zA-Z]").Match([]byte(column[2])) {
+			// Do Nothing. 
+
+		} else {
+			tmp := column[3]
+			column[3] = column[2]
+			column[2] = tmp
+		}
+
+		hostMap := map[string]string{
+			"address": column[0],
+			"name":    column[1],
+			"nf":      column[2],
+			"port":    column[3],
+		}
+
+		hosts = append(hosts, []map[string]string{hostMap}...)
 	}
 	return hosts
 }
@@ -154,30 +170,29 @@ func NameResolution(t tsharkHeaders) {
 	var resolvedAddress []string
 	for _, host := range hosts {
 		for i, v := range t {
-			if v.srcAddr == host[0] && v.srcPort == host[2] {
+			if v.srcAddr == host["address"] && v.srcPort == host["port"] {
 				// fmt.Printf("SrcAddr: %s SrcPort: %s Name: %s\n", v.srcAddr, v.srcPort, host[1])
-				t[i].srcAddr = host[1]
-
-				resolvedAddress = checkResolution(resolvedAddress, host[1])
+				t[i].srcAddr = host["name"]
+				resolvedAddress = checkResolution(resolvedAddress, host["name"])
 				continue
 			}
 
-			if v.dstAddr == host[0] && v.dstPort == host[2] {
+			if v.dstAddr == host["address"] && v.dstPort == host["port"] {
 				// fmt.Printf("DstAddr: %s DstPort: %s Name: %s\n", v.dstAddr, v.dstPort, host[1])
-				t[i].dstAddr = host[1]
-				resolvedAddress = checkResolution(resolvedAddress, host[1])
+				t[i].dstAddr = host["name"]
+				resolvedAddress = checkResolution(resolvedAddress, host["name"])
 				continue
 			}
 
-			if v.srcAddr == host[0] {
-				t[i].srcAddr = host[1]
-				resolvedAddress = checkResolution(resolvedAddress, host[1])
+			if v.srcAddr == host["address"] {
+				t[i].srcAddr = host["name"]
+				resolvedAddress = checkResolution(resolvedAddress, host["name"])
 				continue
 			}
 
-			if v.dstAddr == host[0] {
-				t[i].dstAddr = host[1]
-				resolvedAddress = checkResolution(resolvedAddress, host[1])
+			if v.dstAddr == host["address"] {
+				t[i].dstAddr = host["name"]
+				resolvedAddress = checkResolution(resolvedAddress, host["name"])
 				continue
 			}
 		}
