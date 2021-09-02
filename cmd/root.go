@@ -49,7 +49,7 @@ func init() {
 		t := makeplantuml.RunTshark(params.fileName)
 		makeplantuml.CreateTemplate()
 		makeplantuml.NameResolution(t)
-		makeplantuml.WriteUml(t)
+		makeplantuml.WriteUml(t, params.timeStamp)
 		makeplantuml.RenderingUml()
 		return nil
 	}

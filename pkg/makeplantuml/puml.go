@@ -41,7 +41,7 @@ func CreateTemplate() {
 	file.Write(([]byte)("}\n\n"))
 }
 
-func WriteUml(t tsharkHeaders) {
+func WriteUml(t tsharkHeaders, tf bool) {
 	file, err := os.OpenFile(pumlLocation.path + "/tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		fmt.Println(err)
@@ -53,8 +53,13 @@ func WriteUml(t tsharkHeaders) {
 			fmt.Fprintln(file, "")
 		}
 
-		str := v.srcAddr + " -> " + v.dstAddr + " : " + v.message
+		str := v.srcAddr + " -> " + v.dstAddr + " : ["+ v.number + "][" + v.protocol + "] " + v.message
 		fmt.Fprintln(file, str)
+
+		if tf {
+			rnote := "rnote left: " + v.time
+			fmt.Fprintln(file, rnote)
+		}
 	}
 	fmt.Fprintln(file, "\n@enduml")
 }
