@@ -61,7 +61,7 @@ func WriteUml(t tsharkHeaders, tf bool) {
 			fmt.Fprintln(file, "")
 		}
 
-		str := v.srcAddr + " -> " + v.dstAddr + " : ["+ v.number + "][" + v.protocol + "] " + v.message
+		str := "\"" + v.srcAddr + "\" -> \"" + v.dstAddr + "\" : ["+ v.number + "][" + v.protocol + "] " + v.message
 		fmt.Fprintln(file, str)
 
 		if tf {

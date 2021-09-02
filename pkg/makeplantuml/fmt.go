@@ -169,19 +169,28 @@ func NameResolution(t tsharkHeaders) {
 
 	var resolvedAddress []string
 	for _, host := range hosts {
+		label1:
 		for i, v := range t {
 			if v.srcAddr == host["address"] && v.srcPort == host["port"] {
-				// fmt.Printf("SrcAddr: %s SrcPort: %s Name: %s\n", v.srcAddr, v.srcPort, host[1])
 				t[i].srcAddr = host["name"]
 				resolvedAddress = checkResolution(resolvedAddress, host["name"])
 				continue
 			}
 
 			if v.dstAddr == host["address"] && v.dstPort == host["port"] {
-				// fmt.Printf("DstAddr: %s DstPort: %s Name: %s\n", v.dstAddr, v.dstPort, host[1])
 				t[i].dstAddr = host["name"]
 				resolvedAddress = checkResolution(resolvedAddress, host["name"])
 				continue
+			}
+
+			for _, w := range hosts {
+				if host["address"] == w["address"] && v.srcPort == w["port"] && host["port"] != "" && host["name"] != w["name"] {
+					break label1
+				}
+
+				if host["address"] == w["address"] && v.dstPort == w["port"] && host["port"] != "" && host["name"] != w["name"] {
+					break label1
+				}
 			}
 
 			if v.srcAddr == host["address"] {
