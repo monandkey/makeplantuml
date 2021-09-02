@@ -22,7 +22,6 @@ build-golang-zip:
 		--file ./zip/Dockerfile \
 		./
 
-
 .PHONY: build-makeplantuml
 build-makeplantuml:
 	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
@@ -30,10 +29,8 @@ build-makeplantuml:
 		--file ./Dockerfile \
 		--no-cache \
 		./
-	
-	docker run -itd --name makeplantuml ${DOCKER_REPOSITORY}:${DOCKER_TAG} /bin/bash
-	docker container cp makeplantuml:/home/makeplantuml/bin/makeplantuml-windows.zip .
-	docker container stop makeplantuml
-	docker container rm makeplantuml
 
-
+# docker run -itd --name makeplantuml ${DOCKER_REPOSITORY}:${DOCKER_TAG} /bin/bash
+# docker container cp makeplantuml:/home/makeplantuml/bin/makeplantuml-windows.zip .
+# docker container stop makeplantuml
+# docker container rm makeplantuml
