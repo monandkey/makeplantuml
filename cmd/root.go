@@ -52,7 +52,7 @@ func init() {
 			return rootCmd.Help()
 		}
 
-		t := makeplantuml.RunTshark()
+		t := makeplantuml.RunTshark(params.fileName)
 		makeplantuml.CreateTemplate()
 		makeplantuml.NameResolution(t)
 		makeplantuml.WriteUml(t)

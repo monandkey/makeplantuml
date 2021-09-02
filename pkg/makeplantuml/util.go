@@ -23,3 +23,12 @@ func fileRead(fileName string) string {
     }
 	return string(buf)
 }
+
+type location struct {
+	path string
+}
+
+func (l location) validateLocation() bool {
+	_, err := os.Stat(l.path)
+	return err != nil
+}

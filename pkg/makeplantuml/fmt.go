@@ -64,6 +64,10 @@ func (t tsharkHeaders) setHeader(out string) tsharkHeaders {
 	lines := strings.Split(out, "\n")
 
 	for _, line := range lines {
+		if regexp.MustCompile(",\r$").Match([]byte(line)) {
+			line = regexp.MustCompile(",\r$").ReplaceAllString(line, ",\"\"")
+		}
+
 		if regexp.MustCompile(",$").Match([]byte(line)) {
 			line = regexp.MustCompile(",$").ReplaceAllString(line, ",\"\"")
 		}
@@ -130,7 +134,7 @@ func checkResolution(r []string, t string) []string {
 			return r
 		}
 	}
-	file, err := os.OpenFile(".tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(pumlLocation.path + "/tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -178,18 +182,4 @@ func NameResolution(t tsharkHeaders) {
 			}
 		}
 	}
-}
-
-func WriteUml(t tsharkHeaders) {
-	file, err := os.OpenFile(".tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
-
-	for _, v := range t {
-		str := v.srcAddr + " -> " + v.dstAddr + " : " + v.message
-		fmt.Fprintln(file, str)
-	}
-	fmt.Fprintln(file, "@enduml")
 }

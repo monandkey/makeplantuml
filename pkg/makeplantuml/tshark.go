@@ -7,7 +7,7 @@ import (
 	"os/exec"
 )
 
-func RunTshark() tsharkHeaders {
+func RunTshark(fileName string) tsharkHeaders {
 	var cmd string
 	switch(runtime.GOOS) {
 		case "windows":
@@ -20,7 +20,7 @@ func RunTshark() tsharkHeaders {
 	}
 
 	out, err := exec.Command(cmd,
-		"-r", "./sample/440110000001519.pcap",
+		"-r", fileName,
 		"-t", "ad",
 		"-T", "fields",
 		"-E", "separator=,",
