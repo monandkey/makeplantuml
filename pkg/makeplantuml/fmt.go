@@ -179,3 +179,17 @@ func NameResolution(t tsharkHeaders) {
 		}
 	}
 }
+
+func WriteUml(t tsharkHeaders) {
+	file, err := os.OpenFile(".tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+
+	for _, v := range t {
+		str := v.srcAddr + " -> " + v.dstAddr + " : " + v.message
+		fmt.Fprintln(file, str)
+	}
+	fmt.Fprintln(file, "@enduml")
+}

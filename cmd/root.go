@@ -53,9 +53,10 @@ func init() {
 		}
 
 		t := makeplantuml.RunTshark()
-		// makeplantuml.CreateTemplate()
+		makeplantuml.CreateTemplate()
 		makeplantuml.NameResolution(t)
-		fmt.Println(t)
+		makeplantuml.WriteUml(t)
+		makeplantuml.RenderingUml()
 		return nil
 	}
 }
