@@ -54,6 +54,43 @@ func setPortAndCheckSum(u string, t string, s string) string {
 	return ""
 }
 
+func setMessage(msg string, protocol string) string {
+	msg = regexp.MustCompile("\"").ReplaceAllString(msg, "")
+
+	if protocol == "GTPv2" {
+		return msg
+	}
+
+	if protocol == "DIAMETER" {
+		msg = regexp.MustCompile("Request.*$").ReplaceAllString(msg, "Request")
+		msg = regexp.MustCompile("Answer.*$").ReplaceAllString(msg, "Answer")
+		msg = regexp.MustCompile("^.*cmd=3GPP-").ReplaceAllString(msg, "")
+		msg = regexp.MustCompile("^.*cmd=").ReplaceAllString(msg, "")
+		return msg
+	}
+
+	if regexp.MustCompile("S1AP").Match([]byte(protocol)) {
+		return msg
+	}
+
+	if protocol == "HTTP" || protocol == "HTTP2" {
+		msg = regexp.MustCompile("^.*: ").ReplaceAllString(msg, "")
+		msg = regexp.MustCompile(",.*$").ReplaceAllString(msg, "")
+		msg = regexp.MustCompile("\\?.*$").ReplaceAllString(msg, "")
+		msg = regexp.MustCompile("nf-instances.*$").ReplaceAllString(msg, "nf-instances")
+
+		if regexp.MustCompile("(GET)|(HEAD)|(POST)|(PUT)|(DELETE)|(CONNECT)|(OPTIONS)|(TRACE)|(PATCH)|[0-9]{3}").Match([]byte(msg)) {
+			return msg
+		}
+		return ""
+	}
+
+	if protocol == "TCP" || protocol == "SCTP" {
+		return ""
+	}
+	return msg
+}
+
 type tsharkHeaders []tsharkHeader
 
 func (t tsharkHeaders) setHeader(out string) tsharkHeaders {
@@ -84,8 +121,12 @@ func (t tsharkHeaders) setHeader(out string) tsharkHeaders {
 		tDstAddr := setAddress(column[7][0], column[8][0])
 		tDstPort := setPortAndCheckSum(column[9][0], column[10][0], column[11][0])
 		tProtocol := regexp.MustCompile("\"").ReplaceAllString(column[12][0], "")
-		tMessage := regexp.MustCompile("\"").ReplaceAllString(column[13][0], "")
+		tMessage := setMessage(column[13][0], tProtocol)
 		tChecksum := setPortAndCheckSum(column[14][0], column[15][0], column[16][0])
+
+		if tMessage == "" {
+			continue
+		}
 
 		th := tsharkHeader{
 			number:   tNumber,
