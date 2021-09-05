@@ -4,7 +4,7 @@
 
 | Base image | tag    |
 | :-         | :-     |
-| golang     | 1.61.1 |
+| golang     | 1.16.1 |
 
 
 Create a container and run the following command
