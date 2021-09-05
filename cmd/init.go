@@ -12,6 +12,7 @@ import (
 type config struct {
 	java           string
 	wireshark      string
+	plantuml       string
 	timestamp      bool
 	nameResolution bool
 }
@@ -24,12 +25,14 @@ func init() {
 	initConfig := config{
 		java:           "",
 		wireshark:      "",
+		plantuml:       "",
 		timestamp:      false,
 		nameResolution: false,
 	}
 
 	initCmd.Flags().StringVar(&initConfig.java, "java-path", initConfig.java, "")
 	initCmd.Flags().StringVar(&initConfig.wireshark, "wireshark-path", initConfig.wireshark, "")
+	initCmd.Flags().StringVar(&initConfig.plantuml, "plantuml-path", initConfig.plantuml, "")
 	initCmd.Flags().BoolVar(&initConfig.timestamp, "feature-timestamp", initConfig.timestamp, "")
 	initCmd.Flags().BoolVar(&initConfig.nameResolution, "feature-name-resolution", initConfig.nameResolution, "")
 
@@ -52,9 +55,14 @@ func init() {
 			initConfig.wireshark = "default"
 		}
 
+		if initConfig.plantuml == "" {
+			initConfig.plantuml = "default"
+		}
+
 		InitConfig := makeplantuml.Config{
 			Java:           initConfig.java,
 			Wireshark:      initConfig.wireshark,
+			Plantuml:       initConfig.plantuml,
 			Timestamp:      initConfig.timestamp,
 			NameResolution: initConfig.nameResolution,
 		}

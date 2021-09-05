@@ -85,7 +85,7 @@ func setMessage(msg string, protocol string) string {
 		return ""
 	}
 
-	if protocol == "TCP" || protocol == "SCTP" {
+	if protocol == "TCP" || protocol == "SCTP" || protocol == "ICMP" {
 		return ""
 	}
 	return msg

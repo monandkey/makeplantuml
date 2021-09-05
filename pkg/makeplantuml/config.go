@@ -23,6 +23,7 @@ type profiles struct {
 type path struct {
 	Java      string `yaml:"java"`
 	Wireshark string `yaml:"wireshark"`
+	Plantuml  string `yaml:"plantuml"`
 }
 
 type feature struct {
@@ -89,6 +90,7 @@ func getConfigName() string {
 type Config struct {
 	Java           string
 	Wireshark      string
+	Plantuml       string
 	Timestamp      bool
 	NameResolution bool
 }
@@ -122,6 +124,7 @@ func InitializeConfig(initConfig Config) {
 		"  path: \n",
 		"    java: " + initConfig.Java + "\n",
 		"    wireshark: " + initConfig.Wireshark + "\n",
+		"    plantuml: " + initConfig.Plantuml + "\n",
 		"  feature: \n",
 		"    timestamp: " + strconv.FormatBool(initConfig.Timestamp) + "\n",
 		"    nameResolution: " + strconv.FormatBool(initConfig.NameResolution) + "\n",
