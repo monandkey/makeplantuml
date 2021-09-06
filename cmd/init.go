@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"github.com/spf13/cobra"
-	"local.packages/makeplantuml"
+	"local.packages/cfg"
 )
 
 type config struct {
@@ -59,7 +59,7 @@ func init() {
 			initConfig.plantuml = "default"
 		}
 
-		InitConfig := makeplantuml.Config{
+		InitConfig := cfg.Config{
 			Java:           initConfig.java,
 			Wireshark:      initConfig.wireshark,
 			Plantuml:       initConfig.plantuml,
@@ -67,8 +67,8 @@ func init() {
 			NameResolution: initConfig.nameResolution,
 		}
 
-		if makeplantuml.ExistInitConfig() {
-			makeplantuml.InitializeConfig(InitConfig)
+		if cfg.ExistInitConfig() {
+			cfg.InitializeConfig(InitConfig)
 			fmt.Println("Create config file")
 			os.Exit(0)
 
@@ -78,7 +78,7 @@ func init() {
 			fmt.Scan(&a)
 
 			if a == "y" {
-				makeplantuml.InitializeConfig(InitConfig)
+				cfg.InitializeConfig(InitConfig)
 				fmt.Println("Overwrite!!")
 			}
 		}

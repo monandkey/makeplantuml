@@ -4,7 +4,8 @@ import (
 	"os"
 	"fmt"
 	"github.com/spf13/cobra"
-	"local.packages/makeplantuml"
+	"local.packages/tshark"
+	"local.packages/uml"
 )
 
 type params struct {
@@ -49,11 +50,11 @@ func init() {
 			return rootCmd.Help()
 		}
 
-		t := makeplantuml.RunTshark(params.fileName)
-		makeplantuml.CreateTemplate(params.title)
-		makeplantuml.NameResolution(t)
-		makeplantuml.WriteUml(t, params.timeStamp)
-		makeplantuml.RenderingUml()
+		t := tshark.RunTshark(params.fileName)
+		uml.CreateTemplate(params.title)
+		tshark.NameResolution(t)
+		uml.WriteUml(t, params.timeStamp)
+		uml.RenderingUml()
 		return nil
 	}
 }

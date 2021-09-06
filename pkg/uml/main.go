@@ -1,30 +1,25 @@
-package makeplantuml
+package uml
 
 import (
 	"os"
 	"fmt"
 	"runtime"
 	"os/exec"
+	"local.packages/util"
+	"local.packages/tshark"
+	"local.packages/cfg"
 )
 
-var pumlLocation = location{
-	path: "./puml",
-}
-
-var outLocation = location{
-	path: "./result",
-}
-
 func CreateTemplate(t string) {
-	if pumlLocation.validateLocation() {
-		err := os.Mkdir(pumlLocation.path, 0777)
+	if util.PumlLocation.ValidateLocation() {
+		err := os.Mkdir(util.PumlLocation.Path, 0777)
 		if err != nil {
 			fmt.Println(os.Stderr, err)
 			os.Exit(0)
 		}
 	}
 
-	file, err := os.Create(pumlLocation.path + "/tmp.puml")
+	file, err := os.Create(util.PumlLocation.Path + "/tmp.puml")
 	if err != nil {
 		fmt.Println(os.Stderr, err)
 	}
@@ -49,8 +44,8 @@ func CreateTemplate(t string) {
 	file.Write(([]byte)("}\n\n"))
 }
 
-func WriteUml(t tsharkHeaders, tf bool) {
-	file, err := os.OpenFile(pumlLocation.path + "/tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
+func WriteUml(t tshark.TsharkHeaders, tf bool) {
+	file, err := os.OpenFile(util.PumlLocation.Path + "/tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -61,11 +56,11 @@ func WriteUml(t tsharkHeaders, tf bool) {
 			fmt.Fprintln(file, "")
 		}
 
-		str := "\"" + v.srcAddr + "\" -> \"" + v.dstAddr + "\" : ["+ v.number + "][" + v.protocol + "] " + v.message
+		str := "\"" + v.SrcAddr + "\" -> \"" + v.DstAddr + "\" : ["+ v.Number + "][" + v.Protocol + "] " + v.Message
 		fmt.Fprintln(file, str)
 
 		if tf {
-			rnote := "rnote left: " + v.time
+			rnote := "rnote left: " + v.Time
 			fmt.Fprintln(file, rnote)
 		}
 	}
@@ -74,7 +69,7 @@ func WriteUml(t tsharkHeaders, tf bool) {
 
 func RenderingUml() {
 	var cmd string
-	if config.Profile.Path.Java == "default" {
+	if cfg.CfgVal.Profile.Path.Java == "default" {
 		switch(runtime.GOOS) {
 			case "windows":
 				cmd = "java"
@@ -86,11 +81,11 @@ func RenderingUml() {
 		}
 
 		} else {
-		cmd = config.Profile.Path.Java
+		cmd = cfg.CfgVal.Profile.Path.Java
 	}
 
-	if outLocation.validateLocation() {
-		err := os.Mkdir(outLocation.path, 0777)
+	if util.OutLocation.ValidateLocation() {
+		err := os.Mkdir(util.OutLocation.Path, 0777)
 		if err != nil {
 			fmt.Println(os.Stderr, err)
 			os.Exit(0)
@@ -99,8 +94,8 @@ func RenderingUml() {
 
 	err := exec.Command(cmd,
 		"-jar", "./docs/plantuml.jar",
-		pumlLocation.path + "/tmp.puml",
-		"-o", "." + outLocation.path,
+		util.PumlLocation.Path + "/tmp.puml",
+		"-o", "." + util.OutLocation.Path,
 	).Run()
 
 	if err != nil {
