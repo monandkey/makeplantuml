@@ -1,5 +1,7 @@
 package tshark
 
+type TsharkHeaders []TsharkHeader
+
 type TsharkHeader struct {
 	Number   string
 	Time     string

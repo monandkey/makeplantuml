@@ -71,13 +71,11 @@ func setMessage(msg string, protocol string) string {
 		return ""
 	}
 
-	if protocol == "TCP" || protocol == "SCTP" || protocol == "ICMP" {
+	if protocol == "TCP" || protocol == "SCTP" || regexp.MustCompile("ICMP").Match([]byte(protocol)) {
 		return ""
 	}
 	return msg
 }
-
-type TsharkHeaders []TsharkHeader
 
 func (t TsharkHeaders) setHeader(out string) TsharkHeaders {
 	for regexp.MustCompile(",,").Match([]byte(out)) {

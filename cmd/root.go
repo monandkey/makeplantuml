@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 	"fmt"
+	"errors"
 	"github.com/spf13/cobra"
 	"local.packages/tshark"
 	"local.packages/uml"
@@ -51,6 +52,10 @@ func init() {
 		}
 
 		t := tshark.RunTshark(params.fileName)
+		if len(t) == 0 {
+			return errors.New("The result of tshark execution is not the expected value.")
+		}
+
 		uml.CreateTemplate(params.title)
 		tshark.NameResolution(t)
 		uml.WriteUml(t, params.timeStamp)

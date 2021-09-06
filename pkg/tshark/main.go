@@ -9,7 +9,11 @@ import (
 )
 
 func RunTshark(fileName string) TsharkHeaders {
-	var cmd string
+	var (
+		fmtOut TsharkHeaders
+		cmd string
+	)
+
 	if cfg.CfgVal.Profile.Path.Wireshark == "default" {
 		switch(runtime.GOOS) {
 			case "windows":
@@ -18,7 +22,7 @@ func RunTshark(fileName string) TsharkHeaders {
 				cmd = "tshark"
 			default:
 				fmt.Println("Your OS not support.")
-				os.Exit(0)
+				return fmtOut
 		}
 
 	} else {
@@ -52,9 +56,8 @@ func RunTshark(fileName string) TsharkHeaders {
 
 	if err != nil {
 		fmt.Println(os.Stderr, err)
-		os.Exit(0)
+		return fmtOut
 	}
 
-	var fmtOut TsharkHeaders
 	return fmtOut.setHeader(string(out))
 }
