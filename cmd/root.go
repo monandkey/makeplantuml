@@ -61,8 +61,14 @@ func init() {
 		}
 
 		tshark.NameResolution(t, "./profile/hosts")
-		uml.WriteUml(t, params.timeStamp)
-		uml.RenderingUml()
+
+		if err := uml.WriteUml(t, params.timeStamp); err != nil {
+			return err
+		}
+
+		if err := uml.RenderingUml(); err != nil {
+			return err
+		}
 		return nil
 	}
 }
