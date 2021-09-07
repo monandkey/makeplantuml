@@ -3,6 +3,7 @@ package cfg
 import (
 	"os"
 	"fmt"
+	"errors"
 	"runtime"
 	"strconv"
 	"io/ioutil"
@@ -55,7 +56,7 @@ func getConfigName() string {
 	return ".makeplantuml.yml"
 }
 
-func InitializeConfig(initConfig Config) {
+func InitializeConfig(initConfig Config) error {
 	homeDir, _ := os.UserHomeDir()
 	var fileName string
 
@@ -68,14 +69,12 @@ func InitializeConfig(initConfig Config) {
 		fileName = str
 
 	} else {
-		fmt.Println("Your OS is not supported.")
-		os.Exit(0)
+		return errors.New("Your OS is not supported.")
 	}
 
 	fp, err := os.Create(fileName)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	defer fp.Close()
 	data := [] string{
@@ -89,10 +88,11 @@ func InitializeConfig(initConfig Config) {
 		"    timestamp: " + strconv.FormatBool(initConfig.Timestamp) + "\n",
 		"    nameResolution: " + strconv.FormatBool(initConfig.NameResolution) + "\n",
 	}
-	writeConfig(data, fileName)
+	err = writeConfig(data, fileName)
+	return err
 }
 
-func writeConfig(data []string, fileName string) {
+func writeConfig(data []string, fileName string) error {
 	b := []byte{}
 	for _, line := range data {
 		ll := []byte(line)
@@ -102,10 +102,7 @@ func writeConfig(data []string, fileName string) {
 	}
 
 	err := ioutil.WriteFile(fileName, b, 0666)
-	if err != nil {
-		fmt.Println(os.Stderr, err)
-		os.Exit(0)
-	}
+	return err
 }
 
 func ExistInitConfig() bool {

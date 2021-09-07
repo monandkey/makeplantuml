@@ -68,9 +68,11 @@ func init() {
 		}
 
 		if cfg.ExistInitConfig() {
-			cfg.InitializeConfig(InitConfig)
+			if err := cfg.InitializeConfig(InitConfig); err != nil {
+				return err
+			}
+
 			fmt.Println("Create config file")
-			os.Exit(0)
 
 		} else {
 			var a string
@@ -78,7 +80,9 @@ func init() {
 			fmt.Scan(&a)
 
 			if a == "y" {
-				cfg.InitializeConfig(InitConfig)
+				if err := cfg.InitializeConfig(InitConfig); err != nil {
+					return err
+				}
 				fmt.Println("Overwrite!!")
 			}
 		}
