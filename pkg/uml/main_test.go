@@ -96,7 +96,11 @@ func TestWriteUml(t *testing.T) {
 				t.Errorf("err: %s\n", err)
 			
 			} else {
-				fmt.Println(util.FileRead(fileDir + fileName))
+				res, err := util.FileRead(fileDir + fileName)
+				if err != nil {
+					t.Errorf("Failed to load the file.")
+				}
+				fmt.Println(res)
 			}
 		})
 	}
@@ -164,7 +168,11 @@ func TestRenderingUml(t *testing.T) {
 
 	t.Run(tests.name, func(t *testing.T) {
 		preparationRendering(t, tests.args)
-		fmt.Println(util.FileRead(fileDir + fileName))
+		res, err := util.FileRead(fileDir + fileName)
+		if err != nil {
+			t.Errorf("Failed to load the file.")
+		}
+		fmt.Println(res)
 
 		if err := uml.RenderingUml(); err != tests.want {
 			t.Errorf("Failed to render the puml file.\nerr: %s\n", err)

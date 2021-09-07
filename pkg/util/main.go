@@ -2,12 +2,13 @@ package util
 
 import (
 	"os"
+    "errors"
 )
 
-func FileRead(fileName string) string {
+func FileRead(fileName string) (string, error) {
     fp, err := os.Open(fileName)
     if err != nil {
-        panic(err)
+        return "", err
     }
     defer fp.Close()
 
@@ -18,15 +19,24 @@ func FileRead(fileName string) string {
             break
         }
         if err != nil {
-            panic(err)
+            return "", err
         }
     }
-	return string(buf)
+	return string(buf), nil
 }
 
 func FileRemove(fileName string) error {
+    if FileExist(fileName) {
+        return errors.New("The file does not exist.")
+    }
+
     err := os.RemoveAll(fileName)
     return err
+}
+
+func FileExist(fileName string) bool {
+	_, err := os.Stat(fileName)
+	return err != nil
 }
 
 func (l Location) ValidateLocation() bool {

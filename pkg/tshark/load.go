@@ -70,7 +70,12 @@ func checkResolution(r []string, t string) []string {
 
 
 func NameResolution(t TsharkHeaders, hostsFile string) {
-	hosts := hostInfoFormating(util.FileRead(hostsFile))
+	tmp, err := util.FileRead(hostsFile)
+	if err != nil {
+		return
+	}
+
+	hosts := hostInfoFormating(tmp)
 
 	var resolvedAddress []string
 	for _, host := range hosts {
