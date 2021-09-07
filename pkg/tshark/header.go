@@ -60,6 +60,10 @@ func SetAddress(v4 string, v6 string, lenv4 string, lenv6 string) string {
 		lines = append(lines, []map[string]string{column}...)
 	}
 
+	if len(lines) == 1 {
+		return lines[0]["address"]
+	}
+
 	for i, _ := range lines {
 		for j, _ := range lines {
 			right, _ := strconv.Atoi(lines[i]["length"])
