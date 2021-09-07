@@ -3,21 +3,76 @@ package tshark
 import (
 	"regexp"
 	"strings"
+	"strconv"
 )
 
-func SetAddress(v4 string, v6 string) string {
+func SetAddress(v4 string, v6 string, lenv4 string, lenv6 string) string {
 	v4 = regexp.MustCompile("\"").ReplaceAllString(v4, "")
 	v6 = regexp.MustCompile("\"").ReplaceAllString(v6, "")
+	lenv4 = regexp.MustCompile("\"").ReplaceAllString(lenv4, "")
+	lenv6 = regexp.MustCompile("\"").ReplaceAllString(lenv6, "")
 
-	if v4 != "" && v6 == "" {
-		return v4
+	var (
+		v4s     []string
+		v6s     []string
+		linesv4 []string
+		linesv6 []string
+		lines   []map[string]string
+	)
+
+	if regexp.MustCompile(",").Match([]byte(lenv4)) {
+		linesv4 = strings.Split(lenv4, ",")
+		v4s = strings.Split(v4, ",")
+
+		for i, _ := range linesv4 {
+			column := map[string]string{
+				"address": v4s[i],
+				"length":  linesv4[i],
+			}
+			lines = append(lines, []map[string]string{column}...)
+		}
+	
+	} else if v4 != "" {
+		column := map[string]string{
+			"address": v4,
+			"length":  lenv4,
+		}
+		lines = append(lines, []map[string]string{column}...)
 	}
 
-	if v4 == "" && v6 != "" {
-		return v6
+	if regexp.MustCompile(",").Match([]byte(lenv6)) {
+		linesv6 = strings.Split(lenv6, ",")
+		v6s = strings.Split(v6, ",")
+
+		for i, _ := range linesv6 {
+			column := map[string]string{
+				"address": v6s[i],
+				"length":  linesv6[i],
+			}
+			lines = append(lines, []map[string]string{column}...)
+		}
+
+	} else if v6 != "" {
+		column := map[string]string{
+			"address": v6,
+			"length":  lenv6,
+		}
+		lines = append(lines, []map[string]string{column}...)
 	}
 
-	return ""
+	for i, _ := range lines {
+		for j, _ := range lines {
+			right, _ := strconv.Atoi(lines[i]["length"])
+			left, _ := strconv.Atoi(lines[j]["length"])
+
+			if right < left {
+				tmp := lines[i]
+				lines[i] = lines[j]
+				lines[j] = tmp
+			}
+		}
+	}
+	return lines[0]["address"]
 }
 
 func SetPortAndCheckSum(u string, t string, s string) string {
@@ -72,7 +127,7 @@ func SetMessage(msg string, protocol string) string {
 		return ""
 	}
 
-	if protocol == "TCP" || protocol == "SCTP" || regexp.MustCompile("ICMP").Match([]byte(protocol)) {
+	if protocol == "TCP" || protocol == "SCTP" {
 		return ""
 	}
 	return msg
@@ -101,9 +156,9 @@ func (t TsharkHeaders) SetHeader(out string) TsharkHeaders {
 
 		tNumber := regexp.MustCompile("\"").ReplaceAllString(column[0][0], "")
 		tTime := regexp.MustCompile("\"").ReplaceAllString(column[1][0], "")
-		tSrcAddr := SetAddress(column[2][0], column[3][0])
+		tSrcAddr := SetAddress(column[2][0], column[3][0], column[17][0], column[18][0])
 		tSrcPort := SetPortAndCheckSum(column[4][0], column[5][0], column[6][0])
-		tDstAddr := SetAddress(column[7][0], column[8][0])
+		tDstAddr := SetAddress(column[7][0], column[8][0], column[17][0], column[18][0])
 		tDstPort := SetPortAndCheckSum(column[9][0], column[10][0], column[11][0])
 		tProtocol := regexp.MustCompile("\"").ReplaceAllString(column[12][0], "")
 		tMessage := SetMessage(column[13][0], tProtocol)

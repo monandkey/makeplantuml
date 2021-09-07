@@ -52,6 +52,8 @@ func RunTshark(fileName string) TsharkHeaders {
 		"-e", "udp.checksum",
 		"-e", "sctp.checksum",
 		"-e", "tcp.checksum",
+		"-e", "ip.len",
+		"-e", "ipv6.plen",
 	).Output()
 
 	if err != nil {
