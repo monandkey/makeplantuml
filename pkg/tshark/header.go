@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func setAddress(v4 string, v6 string) string {
+func SetAddress(v4 string, v6 string) string {
 	v4 = regexp.MustCompile("\"").ReplaceAllString(v4, "")
 	v6 = regexp.MustCompile("\"").ReplaceAllString(v6, "")
 
@@ -20,7 +20,7 @@ func setAddress(v4 string, v6 string) string {
 	return ""
 }
 
-func setPortAndCheckSum(u string, t string, s string) string {
+func SetPortAndCheckSum(u string, t string, s string) string {
 	u = regexp.MustCompile("\"").ReplaceAllString(u, "")
 	t = regexp.MustCompile("\"").ReplaceAllString(t, "")
 	s = regexp.MustCompile("\"").ReplaceAllString(s, "")
@@ -40,7 +40,7 @@ func setPortAndCheckSum(u string, t string, s string) string {
 	return ""
 }
 
-func setMessage(msg string, protocol string) string {
+func SetMessage(msg string, protocol string) string {
 	msg = regexp.MustCompile("\"").ReplaceAllString(msg, "")
 
 	if protocol == "GTPv2" {
@@ -59,13 +59,14 @@ func setMessage(msg string, protocol string) string {
 		return msg
 	}
 
-	if protocol == "HTTP" || protocol == "HTTP2" {
+	if regexp.MustCompile("(HTTP)|(HTTP2)").Match([]byte(protocol)) {
+		msg = regexp.MustCompile("^.*, PDU").ReplaceAllString(msg, "PDU")
 		msg = regexp.MustCompile("^.*: ").ReplaceAllString(msg, "")
 		msg = regexp.MustCompile(",.*$").ReplaceAllString(msg, "")
 		msg = regexp.MustCompile("\\?.*$").ReplaceAllString(msg, "")
 		msg = regexp.MustCompile("nf-instances.*$").ReplaceAllString(msg, "nf-instances")
 
-		if regexp.MustCompile("(GET)|(HEAD)|(POST)|(PUT)|(DELETE)|(CONNECT)|(OPTIONS)|(TRACE)|(PATCH)|[0-9]{3}").Match([]byte(msg)) {
+		if regexp.MustCompile("(GET)|(HEAD)|(POST)|(PUT)|(DELETE)|(CONNECT)|(OPTIONS)|(TRACE)|(PATCH)|(PDU)|[0-9]{3}").Match([]byte(msg)) {
 			return msg
 		}
 		return ""
@@ -77,7 +78,7 @@ func setMessage(msg string, protocol string) string {
 	return msg
 }
 
-func (t TsharkHeaders) setHeader(out string) TsharkHeaders {
+func (t TsharkHeaders) SetHeader(out string) TsharkHeaders {
 	for regexp.MustCompile(",,").Match([]byte(out)) {
 		out = regexp.MustCompile(",{2}").ReplaceAllString(out, ",\"\",")
 	}
@@ -100,13 +101,13 @@ func (t TsharkHeaders) setHeader(out string) TsharkHeaders {
 
 		tNumber := regexp.MustCompile("\"").ReplaceAllString(column[0][0], "")
 		tTime := regexp.MustCompile("\"").ReplaceAllString(column[1][0], "")
-		tSrcAddr := setAddress(column[2][0], column[3][0])
-		tSrcPort := setPortAndCheckSum(column[4][0], column[5][0], column[6][0])
-		tDstAddr := setAddress(column[7][0], column[8][0])
-		tDstPort := setPortAndCheckSum(column[9][0], column[10][0], column[11][0])
+		tSrcAddr := SetAddress(column[2][0], column[3][0])
+		tSrcPort := SetPortAndCheckSum(column[4][0], column[5][0], column[6][0])
+		tDstAddr := SetAddress(column[7][0], column[8][0])
+		tDstPort := SetPortAndCheckSum(column[9][0], column[10][0], column[11][0])
 		tProtocol := regexp.MustCompile("\"").ReplaceAllString(column[12][0], "")
-		tMessage := setMessage(column[13][0], tProtocol)
-		tChecksum := setPortAndCheckSum(column[14][0], column[15][0], column[16][0])
+		tMessage := SetMessage(column[13][0], tProtocol)
+		tChecksum := SetPortAndCheckSum(column[14][0], column[15][0], column[16][0])
 
 		if tMessage == "" {
 			continue

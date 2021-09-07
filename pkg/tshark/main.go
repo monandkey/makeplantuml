@@ -59,5 +59,5 @@ func RunTshark(fileName string) TsharkHeaders {
 		return fmtOut
 	}
 
-	return fmtOut.setHeader(string(out))
+	return fmtOut.SetHeader(string(out))
 }
