@@ -57,7 +57,7 @@ func init() {
 		}
 
 		uml.CreateTemplate(params.title)
-		tshark.NameResolution(t)
+		tshark.NameResolution(t, "./profile/hosts")
 		uml.WriteUml(t, params.timeStamp)
 		uml.RenderingUml()
 		return nil

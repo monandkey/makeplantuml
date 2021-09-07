@@ -69,8 +69,8 @@ func checkResolution(r []string, t string) []string {
 }
 
 
-func NameResolution(t TsharkHeaders) {
-	hosts := hostInfoFormating(util.FileRead("./docs/hosts"))
+func NameResolution(t TsharkHeaders, hostsFile string) {
+	hosts := hostInfoFormating(util.FileRead(hostsFile))
 
 	var resolvedAddress []string
 	for _, host := range hosts {
