@@ -56,7 +56,10 @@ func init() {
 			return errors.New("The result of tshark execution is not the expected value.")
 		}
 
-		uml.CreateTemplate(params.title)
+		if err := uml.CreateTemplate(params.title); err != nil {
+			return err
+		}
+
 		tshark.NameResolution(t, "./profile/hosts")
 		uml.WriteUml(t, params.timeStamp)
 		uml.RenderingUml()
