@@ -10,18 +10,17 @@ import (
 	"local.packages/cfg"
 )
 
-func CreateTemplate(t string) {
+func CreateTemplate(t string) error {
 	if util.PumlLocation.ValidateLocation() {
 		err := os.Mkdir(util.PumlLocation.Path, 0777)
 		if err != nil {
-			fmt.Println(os.Stderr, err)
-			os.Exit(0)
+			return err
 		}
 	}
 
 	file, err := os.Create(util.PumlLocation.Path + "/tmp.puml")
 	if err != nil {
-		fmt.Println(os.Stderr, err)
+		return err
 	}
 	defer file.Close()
 
@@ -42,6 +41,7 @@ func CreateTemplate(t string) {
 	file.Write(([]byte)("	BackgroundColor white\n"))
 	file.Write(([]byte)("	BorderColor white\n"))
 	file.Write(([]byte)("}\n\n"))
+	return nil
 }
 
 func WriteUml(t tshark.TsharkHeaders, tf bool) {

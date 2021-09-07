@@ -24,6 +24,11 @@ func FileRead(fileName string) string {
 	return string(buf)
 }
 
+func FileRemove(fileName string) error {
+    err := os.RemoveAll(fileName)
+    return err
+}
+
 func (l Location) ValidateLocation() bool {
 	_, err := os.Stat(l.Path)
 	return err != nil
