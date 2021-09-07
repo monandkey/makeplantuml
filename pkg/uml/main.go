@@ -3,6 +3,7 @@ package uml
 import (
 	"os"
 	"fmt"
+	"errors"
 	"runtime"
 	"os/exec"
 	"local.packages/util"
@@ -44,10 +45,10 @@ func CreateTemplate(t string) error {
 	return nil
 }
 
-func WriteUml(t tshark.TsharkHeaders, tf bool) {
+func WriteUml(t tshark.TsharkHeaders, tf bool) error {
 	file, err := os.OpenFile(util.PumlLocation.Path + "/tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	defer file.Close()
 
@@ -65,10 +66,15 @@ func WriteUml(t tshark.TsharkHeaders, tf bool) {
 		}
 	}
 	fmt.Fprintln(file, "\n@enduml")
+	return nil
 }
 
-func RenderingUml() {
-	var cmd string
+func RenderingUml() error {
+	var (
+		cmd      string
+		plantuml string
+	)
+
 	if cfg.CfgVal.Profile.Path.Java == "default" {
 		switch(runtime.GOOS) {
 			case "windows":
@@ -76,30 +82,36 @@ func RenderingUml() {
 			case "linux":
 				cmd = "java"
 			default:
-				fmt.Println("Your OS not support.")
-				os.Exit(0)
+				return errors.New("Your OS not support.")
 		}
 
 		} else {
 		cmd = cfg.CfgVal.Profile.Path.Java
 	}
 
+	if cfg.CfgVal.Profile.Path.Plantuml == "default" {
+		plantuml = "./docs/plantuml.jar"
+	
+	} else {
+		plantuml = cfg.CfgVal.Profile.Path.Plantuml
+	}
+
 	if util.OutLocation.ValidateLocation() {
 		err := os.Mkdir(util.OutLocation.Path, 0777)
 		if err != nil {
-			fmt.Println(os.Stderr, err)
-			os.Exit(0)
+			return err
 		}
 	}
 
-	err := exec.Command(cmd,
-		"-jar", "./docs/plantuml.jar",
+	out, _ := exec.Command(cmd,
+		"-jar", plantuml,
 		util.PumlLocation.Path + "/tmp.puml",
 		"-o", "." + util.OutLocation.Path,
-	).Run()
+	).CombinedOutput()
 
-	if err != nil {
-		fmt.Println(os.Stderr, err)
-		os.Exit(0)
+	if string(out) != "" {
+		return errors.New("Failed to render the puml file.")
 	}
+
+	return nil
 }
