@@ -110,7 +110,7 @@ func RenderingUml() error {
 	).CombinedOutput()
 
 	if string(out) != "" {
-		return errors.New("Failed to render the puml file.")
+		return errors.New("Failed to render the puml file.\n" + string(out))
 	}
 
 	return nil
