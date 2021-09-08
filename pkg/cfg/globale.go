@@ -1,6 +1,6 @@
 package cfg
 
-var CfgVal = getConfigParameter()
+var Param = getConfigParameter()
 
 const (
 	PlantumlLongPath string = "/home/makeplantuml/container/ext/plantuml.jar"

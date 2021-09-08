@@ -14,7 +14,7 @@ func RunTshark(fileName string) TsharkHeaders {
 		cmd string
 	)
 
-	if cfg.CfgVal.Profile.Path.Wireshark == "default" {
+	if cfg.Param.Profile.Path.Wireshark == "default" {
 		switch(runtime.GOOS) {
 			case "windows":
 				cmd = "C:/Program Files/Wireshark/tshark.exe"
@@ -26,7 +26,7 @@ func RunTshark(fileName string) TsharkHeaders {
 		}
 
 	} else {
-		cmd = cfg.CfgVal.Profile.Path.Wireshark + "\\tshark.exe"
+		cmd = cfg.Param.Profile.Path.Wireshark + "\\tshark.exe"
 	}
 
 	out, err := exec.Command(cmd,

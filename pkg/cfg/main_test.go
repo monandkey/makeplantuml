@@ -118,23 +118,23 @@ func TestConfigLoad(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.name, func(t *testing.T) {
-			if reflect.TypeOf(cfg.CfgVal.Profile.Path.Java) != reflect.TypeOf(v.args.Java) {
+			if reflect.TypeOf(cfg.Param.Profile.Path.Java) != reflect.TypeOf(v.args.Java) {
 				t.Errorf("The type string is the expected value.")
 			}
 
-			if reflect.TypeOf(cfg.CfgVal.Profile.Path.Wireshark) != reflect.TypeOf(v.args.Wireshark) {
+			if reflect.TypeOf(cfg.Param.Profile.Path.Wireshark) != reflect.TypeOf(v.args.Wireshark) {
 				t.Errorf("The type string is the expected value.")
 			}
 
-			if reflect.TypeOf(cfg.CfgVal.Profile.Path.Plantuml) != reflect.TypeOf(v.args.Plantuml) {
+			if reflect.TypeOf(cfg.Param.Profile.Path.Plantuml) != reflect.TypeOf(v.args.Plantuml) {
 				t.Errorf("The type string is the expected value.")
 			}
 
-			if reflect.TypeOf(cfg.CfgVal.Profile.Feature.Timestamp) != reflect.TypeOf(v.args.Timestamp) {
+			if reflect.TypeOf(cfg.Param.Profile.Feature.Timestamp) != reflect.TypeOf(v.args.Timestamp) {
 				t.Errorf("The type bool is the expected value.")
 			}
 
-			if reflect.TypeOf(cfg.CfgVal.Profile.Feature.NameResolution) != reflect.TypeOf(v.args.NameResolution) {
+			if reflect.TypeOf(cfg.Param.Profile.Feature.NameResolution) != reflect.TypeOf(v.args.NameResolution) {
 				t.Errorf("The type bool is the expected value.")
 			}
 		})
