@@ -58,7 +58,7 @@ func validationPlantuml() error {
 	var cmd string
 
 	if CfgVal.Profile.Path.Plantuml == "default" {
-		cmd = "./docs/test.txt"
+		cmd = "./ext/plantuml.jar"
 	
 	} else {
 		cmd = CfgVal.Profile.Path.Plantuml

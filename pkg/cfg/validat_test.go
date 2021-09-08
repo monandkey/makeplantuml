@@ -24,7 +24,7 @@ func TestValidationConfig(t *testing.T) {
 			args: application{
 				java:      "default",
 				wireshark: "default",
-				plantuml:  "/home/makeplantuml/container/docs/plantuml.jar",
+				plantuml:  "/home/makeplantuml/container/ext/plantuml.jar",
 			},
 			want: "",
 		},
@@ -33,7 +33,7 @@ func TestValidationConfig(t *testing.T) {
 			args: application{
 				java:      "",
 				wireshark: "default",
-				plantuml:  "/home/makeplantuml/container/docs/plantuml.jar",
+				plantuml:  "/home/makeplantuml/container/ext/plantuml.jar",
 			},
 			want: "",
 		},
@@ -42,7 +42,7 @@ func TestValidationConfig(t *testing.T) {
 			args: application{
 				java:      "default",
 				wireshark: "",
-				plantuml:  "/home/makeplantuml/container/docs/plantuml.jar",
+				plantuml:  "/home/makeplantuml/container/ext/plantuml.jar",
 			},
 			want: "",
 		},

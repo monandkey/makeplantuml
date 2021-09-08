@@ -90,7 +90,7 @@ func RenderingUml() error {
 	}
 
 	if cfg.CfgVal.Profile.Path.Plantuml == "default" {
-		plantuml = "./docs/plantuml.jar"
+		plantuml = "./ext/plantuml.jar"
 	
 	} else {
 		plantuml = cfg.CfgVal.Profile.Path.Plantuml
