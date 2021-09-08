@@ -15,6 +15,7 @@ type config struct {
 	plantuml       string
 	timestamp      bool
 	nameResolution bool
+	validation     bool
 }
 
 func init() {
@@ -28,6 +29,7 @@ func init() {
 		plantuml:       "",
 		timestamp:      false,
 		nameResolution: false,
+		validation:     false,
 	}
 
 	initCmd.Flags().StringVar(&initConfig.java, "java-path", initConfig.java, "Specify the location of java")
@@ -35,8 +37,14 @@ func init() {
 	initCmd.Flags().StringVar(&initConfig.plantuml, "plantuml-path", initConfig.plantuml, "Specify the location of PlantUML")
 	initCmd.Flags().BoolVar(&initConfig.timestamp, "feature-timestamp", initConfig.timestamp, "Always add a timestamp")
 	initCmd.Flags().BoolVar(&initConfig.nameResolution, "feature-name-resolution", initConfig.nameResolution, "Always resolve names")
+	initCmd.Flags().BoolVar(&initConfig.validation, "validation-config", initConfig.validation, "Verify that the configuration settings are correct")
 
 	initCmd.RunE = func(cmd *cobra.Command, args []string) error {
+		if initConfig.validation {
+			cfg.ValidationConfig()
+			return nil
+		}
+
 		for i, v := range os.Args {
 			if strings.Contains(v, "feature-timestamp") && os.Args[i+1] == "false" {
 				initConfig.timestamp, _ = strconv.ParseBool(os.Args[i+1])
