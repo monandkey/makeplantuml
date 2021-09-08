@@ -49,7 +49,7 @@ func hostInfoFormating(h string) []map[string]string {
 	return hosts
 }
 
-func checkResolution(r []string, t string) []string {
+func checkResolution(r []string, t string, f string) []string {
 	for _, v := range r {
 		if v == t {
 			return r
@@ -61,13 +61,25 @@ func checkResolution(r []string, t string) []string {
 	}
 	defer file.Close()
 
-	str := "participant " + t
-	fmt.Fprintln(file, str)
+	if f != "" {
+		str := "participant " + t + " as " + f
+		fmt.Fprintln(file, str)
+
+	} else {
+		str := "participant " + t
+		fmt.Fprintln(file, str)
+	} 
 
 	r = append(r, t)
 	return r
 }
 
+func NameOrNfSelection(name string, nf string) string {
+	if nf == "" {
+		return name
+	}
+	return nf
+}
 
 func NameResolution(t TsharkHeaders, hostsFile string) {
 	tmp, err := util.FileRead(hostsFile)
@@ -82,14 +94,14 @@ func NameResolution(t TsharkHeaders, hostsFile string) {
 		label1:
 		for i, v := range t {
 			if v.SrcAddr == host["address"] && v.SrcPort == host["port"] {
-				t[i].SrcAddr = host["name"]
-				resolvedAddress = checkResolution(resolvedAddress, host["name"])
+				t[i].SrcAddr = NameOrNfSelection(host["name"], host["nf"])
+				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
 				continue
 			}
 
 			if v.DstAddr == host["address"] && v.DstPort == host["port"] {
-				t[i].DstAddr = host["name"]
-				resolvedAddress = checkResolution(resolvedAddress, host["name"])
+				t[i].DstAddr = NameOrNfSelection(host["name"], host["nf"])
+				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
 				continue
 			}
 
@@ -104,14 +116,14 @@ func NameResolution(t TsharkHeaders, hostsFile string) {
 			}
 
 			if v.SrcAddr == host["address"] {
-				t[i].SrcAddr = host["name"]
-				resolvedAddress = checkResolution(resolvedAddress, host["name"])
+				t[i].SrcAddr = NameOrNfSelection(host["name"], host["nf"])
+				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
 				continue
 			}
 
 			if v.DstAddr == host["address"] {
-				t[i].DstAddr = host["name"]
-				resolvedAddress = checkResolution(resolvedAddress, host["name"])
+				t[i].DstAddr = NameOrNfSelection(host["name"], host["nf"])
+				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
 				continue
 			}
 		}

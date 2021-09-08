@@ -53,3 +53,44 @@ func TestNameResolution(t *testing.T) {
 		}
 	})
 }
+
+func TestNameOrNfSelection(t *testing.T) {
+	type required struct {
+		name string
+		nf   string
+	}
+
+	type Tests struct {
+		name string
+		args required
+		want string
+	}
+
+	tests := []Tests{
+		{
+			name: "w/ name, w/o nf",
+			args: required{
+				name: "enb",
+				nf:   "",
+			},
+			want: "enb",
+		},
+		{
+			name: "w/ name, w/ nf",
+			args: required{
+				name: "enb",
+				nf:   "enb01",
+			},
+			want: "enb01",
+		},
+	}
+
+	for _, v := range tests {
+		t.Run(v.name, func(t *testing.T) {
+			res := tshark.NameOrNfSelection(v.args.name, v.args.nf)
+			if res != v.want {
+				t.Errorf("The return value is not expected.\nres: %s\n", res)
+			}
+		})
+	}
+}
