@@ -6,14 +6,16 @@ import (
 	"strconv"
 	"strings"
 	"github.com/spf13/cobra"
-	"local.packages/makeplantuml"
+	"local.packages/cfg"
 )
 
 type config struct {
 	java           string
 	wireshark      string
+	plantuml       string
 	timestamp      bool
 	nameResolution bool
+	validation     bool
 }
 
 func init() {
@@ -24,16 +26,25 @@ func init() {
 	initConfig := config{
 		java:           "",
 		wireshark:      "",
+		plantuml:       "",
 		timestamp:      false,
 		nameResolution: false,
+		validation:     false,
 	}
 
-	initCmd.Flags().StringVar(&initConfig.java, "java-path", initConfig.java, "")
-	initCmd.Flags().StringVar(&initConfig.wireshark, "wireshark-path", initConfig.wireshark, "")
-	initCmd.Flags().BoolVar(&initConfig.timestamp, "feature-timestamp", initConfig.timestamp, "")
-	initCmd.Flags().BoolVar(&initConfig.nameResolution, "feature-name-resolution", initConfig.nameResolution, "")
+	initCmd.Flags().StringVar(&initConfig.java, "java-path", initConfig.java, "Specify the location of java")
+	initCmd.Flags().StringVar(&initConfig.wireshark, "wireshark-path", initConfig.wireshark, "Specify the location of Wireshark")
+	initCmd.Flags().StringVar(&initConfig.plantuml, "plantuml-path", initConfig.plantuml, "Specify the location of PlantUML")
+	initCmd.Flags().BoolVar(&initConfig.timestamp, "feature-timestamp", initConfig.timestamp, "Always add a timestamp")
+	initCmd.Flags().BoolVar(&initConfig.nameResolution, "feature-name-resolution", initConfig.nameResolution, "Always resolve names")
+	initCmd.Flags().BoolVar(&initConfig.validation, "validation-config", initConfig.validation, "Verify that the configuration settings are correct")
 
 	initCmd.RunE = func(cmd *cobra.Command, args []string) error {
+		if initConfig.validation {
+			cfg.ValidationConfig()
+			return nil
+		}
+
 		for i, v := range os.Args {
 			if strings.Contains(v, "feature-timestamp") && os.Args[i+1] == "false" {
 				initConfig.timestamp, _ = strconv.ParseBool(os.Args[i+1])
@@ -52,17 +63,24 @@ func init() {
 			initConfig.wireshark = "default"
 		}
 
-		InitConfig := makeplantuml.Config{
+		if initConfig.plantuml == "" {
+			initConfig.plantuml = "default"
+		}
+
+		InitConfig := cfg.Config{
 			Java:           initConfig.java,
 			Wireshark:      initConfig.wireshark,
+			Plantuml:       initConfig.plantuml,
 			Timestamp:      initConfig.timestamp,
 			NameResolution: initConfig.nameResolution,
 		}
 
-		if makeplantuml.ExistInitConfig() {
-			makeplantuml.InitializeConfig(InitConfig)
+		if cfg.ExistInitConfig() {
+			if err := cfg.InitializeConfig(InitConfig); err != nil {
+				return err
+			}
+
 			fmt.Println("Create config file")
-			os.Exit(0)
 
 		} else {
 			var a string
@@ -70,7 +88,9 @@ func init() {
 			fmt.Scan(&a)
 
 			if a == "y" {
-				makeplantuml.InitializeConfig(InitConfig)
+				if err := cfg.InitializeConfig(InitConfig); err != nil {
+					return err
+				}
 				fmt.Println("Overwrite!!")
 			}
 		}

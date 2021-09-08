@@ -1,32 +1,14 @@
-package makeplantuml
+package cfg
 
 import (
 	"os"
 	"fmt"
+	"errors"
 	"runtime"
 	"strconv"
 	"io/ioutil"
 	"gopkg.in/yaml.v2"
 )
-
-type profile struct {
-	Path    path    `yaml:"path"`
-	Feature feature `yaml:"feature"`
-}
-
-type path struct {
-	Java      string `yaml:"java"`
-	Wireshark bool   `yaml:"wireshark"`
-}
-
-type feature struct {
-	Timestamp      int    `yaml:"timestamp"`
-	NameResolution string `yaml:"nameResolution"`
-}
-
-type configPath struct {
-	path string
-}
 
 func (c configPath) configLoad() profile {
 	profile := profile{}
@@ -35,15 +17,18 @@ func (c configPath) configLoad() profile {
 	return profile
 }
 
-type disassembledCharacter struct {
-	homedir  string
-	separate string
-	filename string
-}
-
 func (d disassembledCharacter) stringJoin() configPath {
 	c := configPath{path: d.homedir + d.separate + d.filename}
 	return c
+}
+
+func getConfigParameter() profile {
+	ds := disassembledCharacter{
+		homedir:  getHomedir(),
+		separate: getSeparate(),
+		filename: getConfigName(),
+	}
+	return ds.stringJoin().configLoad()
 }
 
 func getHomedir() string {
@@ -71,14 +56,7 @@ func getConfigName() string {
 	return ".makeplantuml.yml"
 }
 
-type Config struct {
-	Java           string
-	Wireshark      string
-	Timestamp      bool
-	NameResolution bool
-}
-
-func InitializeConfig(initConfig Config) {
+func InitializeConfig(initConfig Config) error {
 	homeDir, _ := os.UserHomeDir()
 	var fileName string
 
@@ -91,14 +69,12 @@ func InitializeConfig(initConfig Config) {
 		fileName = str
 
 	} else {
-		fmt.Println("Your OS is not supported.")
-		os.Exit(0)
+		return errors.New("Your OS is not supported.")
 	}
 
 	fp, err := os.Create(fileName)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	defer fp.Close()
 	data := [] string{
@@ -107,14 +83,16 @@ func InitializeConfig(initConfig Config) {
 		"  path: \n",
 		"    java: " + initConfig.Java + "\n",
 		"    wireshark: " + initConfig.Wireshark + "\n",
+		"    plantuml: " + initConfig.Plantuml + "\n",
 		"  feature: \n",
 		"    timestamp: " + strconv.FormatBool(initConfig.Timestamp) + "\n",
 		"    nameResolution: " + strconv.FormatBool(initConfig.NameResolution) + "\n",
 	}
-	writeConfig(data, fileName)
+	err = writeConfig(data, fileName)
+	return err
 }
 
-func writeConfig(data []string, fileName string) {
+func writeConfig(data []string, fileName string) error {
 	b := []byte{}
 	for _, line := range data {
 		ll := []byte(line)
@@ -124,10 +102,7 @@ func writeConfig(data []string, fileName string) {
 	}
 
 	err := ioutil.WriteFile(fileName, b, 0666)
-	if err != nil {
-		fmt.Println(os.Stderr, err)
-		os.Exit(0)
-	}
+	return err
 }
 
 func ExistInitConfig() bool {

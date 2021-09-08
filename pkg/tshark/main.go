@@ -1,22 +1,32 @@
-package makeplantuml
+package tshark
 
 import (
 	"os"
 	"fmt"
 	"runtime"
 	"os/exec"
+	"local.packages/cfg"
 )
 
-func RunTshark(fileName string) tsharkHeaders {
-	var cmd string
-	switch(runtime.GOOS) {
-		case "windows":
-			cmd = "C:/Program Files/Wireshark-3.2.3/tshark.exe"
-		case "linux":
-			cmd = "tshark"
-		default:
-			fmt.Println("Your OS not support.")
-			os.Exit(0)
+func RunTshark(fileName string) TsharkHeaders {
+	var (
+		fmtOut TsharkHeaders
+		cmd string
+	)
+
+	if cfg.Param.Profile.Path.Wireshark == "default" {
+		switch(runtime.GOOS) {
+			case "windows":
+				cmd = "C:/Program Files/Wireshark/tshark.exe"
+			case "linux":
+				cmd = "tshark"
+			default:
+				fmt.Println("Your OS not support.")
+				return fmtOut
+		}
+
+	} else {
+		cmd = cfg.Param.Profile.Path.Wireshark + "\\tshark.exe"
 	}
 
 	out, err := exec.Command(cmd,
@@ -42,13 +52,14 @@ func RunTshark(fileName string) tsharkHeaders {
 		"-e", "udp.checksum",
 		"-e", "sctp.checksum",
 		"-e", "tcp.checksum",
+		"-e", "ip.len",
+		"-e", "ipv6.plen",
 	).Output()
 
 	if err != nil {
 		fmt.Println(os.Stderr, err)
-		os.Exit(0)
+		return fmtOut
 	}
 
-	var fmtOut tsharkHeaders
-	return fmtOut.setHeader(string(out))
+	return fmtOut.SetHeader(string(out))
 }
