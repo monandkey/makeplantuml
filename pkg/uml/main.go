@@ -90,7 +90,7 @@ func RenderingUml() error {
 	}
 
 	if cfg.CfgVal.Profile.Path.Plantuml == "default" {
-		plantuml = PlantumlShortPath
+		plantuml = cfg.PlantumlShortPath
 	
 	} else {
 		plantuml = cfg.CfgVal.Profile.Path.Plantuml

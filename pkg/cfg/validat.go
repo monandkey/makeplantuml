@@ -5,7 +5,6 @@ import (
 	"errors"
 	"runtime"
 	"os/exec"
-	// "local.packages/uml"
 	"local.packages/util"
 )
 
@@ -59,8 +58,7 @@ func validationPlantuml() error {
 	var cmd string
 
 	if CfgVal.Profile.Path.Plantuml == "default" {
-		// cmd = uml.PlantumlShortPath
-		cmd = "./ext/plantuml.jar"
+		cmd = PlantumlShortPath
 	
 	} else {
 		cmd = CfgVal.Profile.Path.Plantuml
