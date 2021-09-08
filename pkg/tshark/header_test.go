@@ -237,6 +237,14 @@ func TestSetMessage(t *testing.T) {
 			want: "S1SetupRequest",
 		},
 		{
+			name: "NGAP",
+			args: required{
+				message: "UplinkNASTransport",
+				protocol: "NGAP/NAS-5GS",
+			},
+			want: "UplinkNASTransport",
+		},
+		{
 			name: "HTTP2 Method GET",
 			args: required{
 				message:  "HEADERS[3]: GET /nnrf-disc/v1/nf-instances?requester-nf-type=SMF&target-nf-type=PCF",
