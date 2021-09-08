@@ -30,11 +30,11 @@ func init() {
 		nameResolution: false,
 	}
 
-	initCmd.Flags().StringVar(&initConfig.java, "java-path", initConfig.java, "")
-	initCmd.Flags().StringVar(&initConfig.wireshark, "wireshark-path", initConfig.wireshark, "")
-	initCmd.Flags().StringVar(&initConfig.plantuml, "plantuml-path", initConfig.plantuml, "")
-	initCmd.Flags().BoolVar(&initConfig.timestamp, "feature-timestamp", initConfig.timestamp, "")
-	initCmd.Flags().BoolVar(&initConfig.nameResolution, "feature-name-resolution", initConfig.nameResolution, "")
+	initCmd.Flags().StringVar(&initConfig.java, "java-path", initConfig.java, "Specify the location of java")
+	initCmd.Flags().StringVar(&initConfig.wireshark, "wireshark-path", initConfig.wireshark, "Specify the location of Wireshark")
+	initCmd.Flags().StringVar(&initConfig.plantuml, "plantuml-path", initConfig.plantuml, "Specify the location of PlantUML")
+	initCmd.Flags().BoolVar(&initConfig.timestamp, "feature-timestamp", initConfig.timestamp, "Always add a timestamp")
+	initCmd.Flags().BoolVar(&initConfig.nameResolution, "feature-name-resolution", initConfig.nameResolution, "Always resolve names")
 
 	initCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		for i, v := range os.Args {
