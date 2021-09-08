@@ -107,6 +107,7 @@ func RenderingUml() error {
 		"-jar", plantuml,
 		util.PumlLocation.Path + "/tmp.puml",
 		"-o", "." + util.OutLocation.Path,
+		"-tsvg",
 	).CombinedOutput()
 
 	if string(out) != "" {
