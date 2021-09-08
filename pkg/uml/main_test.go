@@ -213,7 +213,7 @@ func TestRenderingUml(t *testing.T) {
 }
 
 func preparationRendering(t *testing.T, args tshark.TsharkHeaders) {
-	cfg.CfgVal.Profile.Path.Plantuml = "/home/makeplantuml/container/docs/plantuml.jar"
+	cfg.CfgVal.Profile.Path.Plantuml = uml.PlantumlLongPath
 
 	if err := uml.CreateTemplate(""); err != nil {
 		t.Errorf("Failed to create template.\nerr: %s\n", err)

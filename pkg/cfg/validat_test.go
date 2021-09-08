@@ -2,6 +2,7 @@ package cfg
 
 import (
 	"testing"
+	"local.packages/uml"
 	"local.packages/cfg"
 )
 
@@ -24,7 +25,7 @@ func TestValidationConfig(t *testing.T) {
 			args: application{
 				java:      "default",
 				wireshark: "default",
-				plantuml:  "/home/makeplantuml/container/ext/plantuml.jar",
+				plantuml:  uml.PlantumlLongPath,
 			},
 			want: "",
 		},
@@ -33,7 +34,7 @@ func TestValidationConfig(t *testing.T) {
 			args: application{
 				java:      "",
 				wireshark: "default",
-				plantuml:  "/home/makeplantuml/container/ext/plantuml.jar",
+				plantuml:  uml.PlantumlLongPath,
 			},
 			want: "",
 		},
@@ -42,7 +43,7 @@ func TestValidationConfig(t *testing.T) {
 			args: application{
 				java:      "default",
 				wireshark: "",
-				plantuml:  "/home/makeplantuml/container/ext/plantuml.jar",
+				plantuml:  uml.PlantumlLongPath,
 			},
 			want: "",
 		},
