@@ -11,7 +11,7 @@ import (
 func validationJava() error {
 	var cmd string
 
-	if CfgVal.Profile.Path.Java == "default" {
+	if Param.Profile.Path.Java == "default" {
 		switch(runtime.GOOS) {
 			case "windows":
 				cmd, _ = exec.LookPath("java")
@@ -22,7 +22,7 @@ func validationJava() error {
 		}
 
 		} else {
-		cmd = CfgVal.Profile.Path.Java
+		cmd = Param.Profile.Path.Java
 	}
 
 	if util.FileExist(cmd) {
@@ -34,7 +34,7 @@ func validationJava() error {
 func validationWireshark() error {
 	var cmd string
 
-	if CfgVal.Profile.Path.Wireshark == "default" {
+	if Param.Profile.Path.Wireshark == "default" {
 		switch(runtime.GOOS) {
 			case "windows":
 				cmd = "C:/Program Files/Wireshark/tshark.exe"
@@ -45,7 +45,7 @@ func validationWireshark() error {
 		}
 
 		} else {
-		cmd = CfgVal.Profile.Path.Wireshark + "\\tshark.exe"
+		cmd = Param.Profile.Path.Wireshark + "\\tshark.exe"
 	}
 
 	if util.FileExist(cmd) {
@@ -57,11 +57,11 @@ func validationWireshark() error {
 func validationPlantuml() error {
 	var cmd string
 
-	if CfgVal.Profile.Path.Plantuml == "default" {
+	if Param.Profile.Path.Plantuml == "default" {
 		cmd = PlantumlShortPath
 	
 	} else {
-		cmd = CfgVal.Profile.Path.Plantuml
+		cmd = Param.Profile.Path.Plantuml
 	}
 
 	if util.FileExist(cmd) {

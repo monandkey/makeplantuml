@@ -59,9 +59,9 @@ func TestValidationConfig(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.name, func(t *testing.T) {
-			cfg.CfgVal.Profile.Path.Java = v.args.java
-			cfg.CfgVal.Profile.Path.Wireshark = v.args.wireshark
-			cfg.CfgVal.Profile.Path.Plantuml = v.args.plantuml
+			cfg.Param.Profile.Path.Java = v.args.java
+			cfg.Param.Profile.Path.Wireshark = v.args.wireshark
+			cfg.Param.Profile.Path.Plantuml = v.args.plantuml
 			cfg.ValidationConfig()
 		})
 	}

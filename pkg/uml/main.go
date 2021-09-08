@@ -75,7 +75,7 @@ func RenderingUml() error {
 		plantuml string
 	)
 
-	if cfg.CfgVal.Profile.Path.Java == "default" {
+	if cfg.Param.Profile.Path.Java == "default" {
 		switch(runtime.GOOS) {
 			case "windows":
 				cmd = "java"
@@ -86,14 +86,14 @@ func RenderingUml() error {
 		}
 
 		} else {
-		cmd = cfg.CfgVal.Profile.Path.Java
+		cmd = cfg.Param.Profile.Path.Java
 	}
 
-	if cfg.CfgVal.Profile.Path.Plantuml == "default" {
+	if cfg.Param.Profile.Path.Plantuml == "default" {
 		plantuml = cfg.PlantumlShortPath
 	
 	} else {
-		plantuml = cfg.CfgVal.Profile.Path.Plantuml
+		plantuml = cfg.Param.Profile.Path.Plantuml
 	}
 
 	if util.OutLocation.ValidateLocation() {
