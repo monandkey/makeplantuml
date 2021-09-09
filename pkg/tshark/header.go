@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strings"
 	"strconv"
+	"runtime"
 )
 
 func SetAddress(v4 string, v6 string, lenv4 string, lenv6 string) string {
@@ -186,4 +187,23 @@ func (t TsharkHeaders) SetHeader(out string) TsharkHeaders {
 		t = append(t, th)
 	}
 	return t
+}
+
+func getTsharkCommand() string {
+	if cfg.Param.Profile.Path.Wireshark == "default" {
+		switch(runtime.GOOS) {
+			case "windows":
+				return "C:/Program Files/Wireshark/tshark.exe"
+			case "linux":
+				return "tshark"
+		}
+	}
+	return cfg.Param.Profile.Path.Wireshark + "\\tshark.exe"
+}
+
+func convertOutputResultIntoArray(out string) []string {
+	for regexp.MustCompile(",,").Match([]byte(out)) {
+		out = regexp.MustCompile(",{2}").ReplaceAllString(out, ",\"\",")
+	}
+	return strings.Split(out, "\n")
 }

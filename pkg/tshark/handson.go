@@ -2,87 +2,12 @@ package tshark
 
 import (
 	"regexp"
-	"runtime"
 	"strings"
 	"os/exec"
-	"local.packages/cfg"
 )
-
-type Option func(*flags)
-
-func NormalMode() Option {
-	return func(f *flags) {
-		f.i = 1
-	}
-}
-
-func HandonMode() Option {
-	return func(f *flags) {
-		f.i = 2
-	}
-}
-
-func UseTsharkSelection(options ...Option) TsharkMethod {
-	f := flags{i: 1}
-	for _, option := range options {
-		option(&f)
-		if f.i == 1 {
-			return NormalTshark{}.new()
-
-		} else if f.i == 2 {
-			return HandsonTshark{}.new()
-		}
-	}
-	return NormalTshark{}.new()
-}
-
-func (n NormalTshark) new() TsharkMethod {
-	return NormalTshark{}
-}
 
 func (h HandsonTshark) new() TsharkMethod {
 	return HandsonTshark{}
-}
-
-func (n NormalTshark) SetTsharkCommand() {
-	n.tshark = getTsharkCommand()
-}
-
-func (n NormalTshark) CreateCommand() {
-	n.cmd = []string{
-		"-r", "test",
-		"-t", "ad",
-		"-T", "fields",
-		"-E", "separator=,",
-		"-E", "quote=d",
-		"-e", "frame.number",
-		"-e", "_ws.col.Time",
-		"-e", "ip.src",
-		"-e", "ipv6.src",
-		"-e", "udp.srcport",
-		"-e", "tcp.srcport",
-		"-e", "sctp.srcport",
-		"-e", "ip.dst",
-		"-e", "ipv6.dst",
-		"-e", "udp.dstport",
-		"-e", "tcp.dstport",
-		"-e", "sctp.dstport",
-		"-e", "_ws.col.Protocol",
-		"-e", "_ws.col.Info",
-		"-e", "ip.len",
-		"-e", "ipv6.plen",
-	}
-}
-
-func (n NormalTshark) RunE() error {
-	var err error
-	n.out, err = exec.Command(n.tshark, n.cmd...).Output()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (n NormalTshark) SetHeader() {
@@ -175,23 +100,4 @@ func (h HandsonTshark) SetHeader() {
 		}
 		h.res = append(h.res, th)
 	}
-}
-
-func getTsharkCommand() string {
-	if cfg.Param.Profile.Path.Wireshark == "default" {
-		switch(runtime.GOOS) {
-			case "windows":
-				return "C:/Program Files/Wireshark/tshark.exe"
-			case "linux":
-				return "tshark"
-		}
-	}
-	return cfg.Param.Profile.Path.Wireshark + "\\tshark.exe"
-}
-
-func convertOutputResultIntoArray(out string) []string {
-	for regexp.MustCompile(",,").Match([]byte(out)) {
-		out = regexp.MustCompile(",{2}").ReplaceAllString(out, ",\"\",")
-	}
-	return strings.Split(out, "\n")
 }

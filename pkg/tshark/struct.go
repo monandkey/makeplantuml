@@ -27,16 +27,18 @@ type DuplicatePacketeDropTshark struct {
 	
 }
 
-type NormalTshark struct {
+type TsharkArgs struct {
 	tshark string
-	cmd []string
-	out []byte
+	cmd    []string
+	out    []byte
+}
+
+type NormalTshark struct {
+	TsharkArgs
 }
 
 type HandsonTshark struct {
-	tshark string
-	cmd []string
-	out []byte
+	TsharkArgs
 	res TsharkHeaders
 }
 
@@ -50,3 +52,5 @@ type TsharkMethod interface {
 type flags struct {
 	i int
 }
+
+type Option func(*flags)
