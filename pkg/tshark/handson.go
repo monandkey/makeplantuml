@@ -2,16 +2,11 @@ package tshark
 
 import (
 	"regexp"
-	"strings"
 	"os/exec"
 )
 
 func (h HandsonTshark) new() TsharkMethod {
 	return HandsonTshark{}
-}
-
-func (n NormalTshark) SetHeader() {
-	return
 }
 
 func (h HandsonTshark) SetTsharkCommand() {

@@ -1,8 +1,6 @@
 package tshark
 
 import (
-	"regexp"
-	"strings"
 	"os/exec"
 )
 

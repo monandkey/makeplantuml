@@ -5,6 +5,7 @@ import (
 	"strings"
 	"strconv"
 	"runtime"
+	"local.packages/cfg"
 )
 
 func SetAddress(v4 string, v6 string, lenv4 string, lenv6 string) string {
