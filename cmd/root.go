@@ -45,7 +45,7 @@ func init() {
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.version {
 			fmt.Println("version: 2.0.0")
-			os.Exit(0)
+			return nil
 		}
 
 		if params.fileName == "" {
