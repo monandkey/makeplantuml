@@ -44,5 +44,5 @@ type TsharkMethod interface {
 	SetArgs(string)
 	RunE() error
 	Parse()
-	Display()
+	NameResE(string) error
 }

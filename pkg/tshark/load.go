@@ -81,10 +81,10 @@ func NameOrNfSelection(name string, nf string) string {
 	return nf
 }
 
-func NameResolution(t TsharkHeaders, hostsFile string) {
+func NameResolution(headers []map[string]string, hostsFile string) error {
 	tmp, err := util.FileRead(hostsFile)
 	if err != nil {
-		return
+		return err
 	}
 
 	hosts := hostInfoFormating(tmp)
@@ -92,40 +92,41 @@ func NameResolution(t TsharkHeaders, hostsFile string) {
 	var resolvedAddress []string
 	for _, host := range hosts {
 		label1:
-		for i, v := range t {
-			if v.SrcAddr == host["address"] && v.SrcPort == host["port"] {
-				t[i].SrcAddr = NameOrNfSelection(host["name"], host["nf"])
+		for i, header := range headers {
+			if header["srcAddr"] == host["address"] && header["srcPort"] == host["port"] {
+				headers[i]["srcAddr"] = NameOrNfSelection(host["name"], host["nf"])
 				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
 				continue
 			}
 
-			if v.DstAddr == host["address"] && v.DstPort == host["port"] {
-				t[i].DstAddr = NameOrNfSelection(host["name"], host["nf"])
+			if header["dstAddr"] == host["address"] && header["dstPort"] == host["port"] {
+				headers[i]["dstAddr"] = NameOrNfSelection(host["name"], host["nf"])
 				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
 				continue
 			}
 
 			for _, w := range hosts {
-				if host["address"] == w["address"] && v.SrcPort == w["port"] && host["port"] != "" && host["name"] != w["name"] {
+				if host["address"] == w["address"] && header["srcPort"] == w["port"] && host["port"] != "" && host["name"] != w["name"] {
 					break label1
 				}
 
-				if host["address"] == w["address"] && v.DstPort == w["port"] && host["port"] != "" && host["name"] != w["name"] {
+				if host["address"] == w["address"] && header["dstPort"] == w["port"] && host["port"] != "" && host["name"] != w["name"] {
 					break label1
 				}
 			}
 
-			if v.SrcAddr == host["address"] {
-				t[i].SrcAddr = NameOrNfSelection(host["name"], host["nf"])
+			if header["srcAddr"] == host["address"] {
+				headers[i]["srcAddr"] = NameOrNfSelection(host["name"], host["nf"])
 				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
 				continue
 			}
 
-			if v.DstAddr == host["address"] {
-				t[i].DstAddr = NameOrNfSelection(host["name"], host["nf"])
+			if header["dstAddr"] == host["address"] {
+				headers[i]["dstAddr"] = NameOrNfSelection(host["name"], host["nf"])
 				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
 				continue
 			}
 		}
 	}
+	return nil
 }

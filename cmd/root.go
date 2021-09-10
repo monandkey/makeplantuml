@@ -3,11 +3,8 @@ package cmd
 import (
 	"os"
 	"fmt"
-	// "errors"
 	"github.com/spf13/cobra"
-	"local.packages/tshark"
 	"local.packages/user"
-	// "local.packages/uml"
 )
 
 type params struct {
@@ -52,7 +49,7 @@ func init() {
 			return rootCmd.Help()
 		}
 
-		var use tshark.TsharkMethod
+		var use user.UserMethod
 		use = user.UseTsharkSelection(user.Normal())
 		use.SetCmd()
 		use.SetArgs(params.fileName)
@@ -62,25 +59,22 @@ func init() {
 		}
 
 		use.Parse()
+		
+		if err := use.NameResE("./profile/hosts"); err != nil {
+			return err
+		}
 
-		// t := tshark.RunTshark(params.fileName)
-		// if len(t) == 0 {
-		// 	return errors.New("The result of tshark execution is not the expected value.")
-		// }
+		if err := use.CreateE(params.title); err != nil {
+			return err
+		}
 
-		// if err := uml.CreateTemplate(params.title); err != nil {
-		// 	return err
-		// }
+		if err := use.WritingE(params.timeStamp); err != nil {
+			return err
+		}
 
-		// tshark.NameResolution(t, "./profile/hosts")
-
-		// if err := uml.WriteUml(t, params.timeStamp); err != nil {
-		// 	return err
-		// }
-
-		// if err := uml.RenderingUml(); err != nil {
-		// 	return err
-		// }
+		if err := use.RenderingE(); err != nil {
+			return err
+		}
 		return nil
 	}
 }

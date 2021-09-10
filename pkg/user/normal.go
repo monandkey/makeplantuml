@@ -4,18 +4,19 @@ import (
 	"fmt"
 	"regexp"
 	"os/exec"
+	"local.packages/uml"
 	"local.packages/tshark"
 )
 
-func (n NormalUser) new() tshark.TsharkMethod {
-	return &NormalUser{}
+func (n normalUser) new() UserMethod {
+	return &normalUser{}
 }
 
-func (n *NormalUser) SetCmd() {
+func (n *normalUser) SetCmd() {
 	n.Cmd = tshark.GetTsharkCommand()
 }
 
-func (n *NormalUser) SetArgs(fileName string) {
+func (n *normalUser) SetArgs(fileName string) {
 	n.Args = []string{
 		"-r", fileName,
 		"-t", "ad",
@@ -41,7 +42,7 @@ func (n *NormalUser) SetArgs(fileName string) {
 	}
 }
 
-func (n *NormalUser) RunE() error {
+func (n *normalUser) RunE() error {
 	var err error
 	n.Out, err = exec.Command(n.Cmd, n.Args...).Output()
 
@@ -51,7 +52,7 @@ func (n *NormalUser) RunE() error {
 	return nil
 }
 
-func (n *NormalUser) Parse() {
+func (n *normalUser) Parse() {
 	lines := tshark.ConvertOutputResultIntoArray(string(n.Out))
 
 	for _, line := range lines {
@@ -85,8 +86,34 @@ func (n *NormalUser) Parse() {
 	}
 }
 
-func (n *NormalUser) Display() {
-	fmt.Println(n.Header)
-	return
+func (n *normalUser) NameResE(fileName string) error {
+	if err := tshark.NameResolution(n.Header, fileName); err != nil {
+		return err
+	}
+	return nil
 }
 
+func (n *normalUser) Display() {
+	fmt.Println(n.Header)
+}
+
+func (n *normalUser) CreateE(title string) error {
+	if err := uml.CreateTemplate(title); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (n *normalUser) WritingE(timestamp bool) error {
+	if err := uml.WriteUml(n.Header, timestamp); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (n *normalUser) RenderingE() error {
+	if err := uml.RenderingUml(); err != nil {
+		return err
+	}
+	return nil
+}

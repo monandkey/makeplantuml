@@ -1,9 +1,17 @@
 package user
 
 import (
+	"local.packages/uml"
 	"local.packages/tshark"
 )
-type NormalUser struct {
+
+type UserMethod interface {
+	tshark.TsharkMethod
+	uml.UmlMethod
+	Display()
+}
+
+type normalUser struct {
 	tshark.TsharkArgs
 }
 
