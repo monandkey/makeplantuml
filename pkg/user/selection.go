@@ -20,7 +20,7 @@ func UseTsharkSelection(options ...Option) UserMethod {
 			return normalUser{}.new()
 
 		} else if f.i == 2 {
-			// return HandsonTshark{}.new()
+			return handsonUser{}.new()
 		}
 	}
 	return normalUser{}.new()

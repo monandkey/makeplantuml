@@ -34,11 +34,6 @@ type TsharkArgs struct {
 	Header []map[string]string
 }
 
-type HandsonTshark struct {
-	TsharkArgs
-	res TsharkHeaders
-}
-
 type TsharkMethod interface {
 	SetCmd()
 	SetArgs(string)

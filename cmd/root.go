@@ -12,6 +12,7 @@ type params struct {
 	fileName  string
 	timeStamp bool
 	title     string
+	handson   bool
 }
 
 var rootCmd = &cobra.Command{}
@@ -32,12 +33,14 @@ func init() {
 		fileName:  "",
 		timeStamp: false,
 		title:     "",
+		handson:   false,
 	}
 
 	rootCmd.Flags().BoolVarP(&params.version, "version", "v", params.version, "Display version.")
 	rootCmd.Flags().StringVarP(&params.fileName, "filename", "f", params.fileName, "Target file name.")
 	rootCmd.Flags().BoolVarP(&params.timeStamp, "timestamp", "t", params.timeStamp, "Print a timestamp")
 	rootCmd.Flags().StringVar(&params.title, "puml-title", params.title, "Give PUML a title.")
+	rootCmd.Flags().BoolVar(&params.handson, "handson-environment", params.handson, "For captures acquired in hands-on environment.")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.version {
@@ -50,7 +53,12 @@ func init() {
 		}
 
 		var use user.UserMethod
-		use = user.UseTsharkSelection(user.Normal())
+		if params.handson {
+			use = user.UseTsharkSelection(user.Handon())
+
+		} else {
+			use = user.UseTsharkSelection(user.Normal())
+		}
 		use.SetCmd()
 		use.SetArgs(params.fileName)
 

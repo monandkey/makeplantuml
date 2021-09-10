@@ -15,6 +15,10 @@ type normalUser struct {
 	tshark.TsharkArgs
 }
 
+type handsonUser struct {
+	tshark.TsharkArgs
+}
+
 type flags struct {
 	i int
 }
