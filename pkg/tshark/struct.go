@@ -28,13 +28,10 @@ type DuplicatePacketeDropTshark struct {
 }
 
 type TsharkArgs struct {
-	tshark string
-	cmd    []string
-	out    []byte
-}
-
-type NormalTshark struct {
-	TsharkArgs
+	Cmd    string
+	Args   []string
+	Out    []byte
+	Header []map[string]string
 }
 
 type HandsonTshark struct {
@@ -43,14 +40,9 @@ type HandsonTshark struct {
 }
 
 type TsharkMethod interface {
-	SetTsharkCommand()
-	CreateCommand()
+	SetCmd()
+	SetArgs(string)
 	RunE() error
-	SetHeader()
+	Parse()
+	Display()
 }
-
-type flags struct {
-	i int
-}
-
-type Option func(*flags)
