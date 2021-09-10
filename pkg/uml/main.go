@@ -7,7 +7,6 @@ import (
 	"runtime"
 	"os/exec"
 	"local.packages/util"
-	"local.packages/tshark"
 	"local.packages/cfg"
 )
 
@@ -45,23 +44,23 @@ func CreateTemplate(t string) error {
 	return nil
 }
 
-func WriteUml(t tshark.TsharkHeaders, tf bool) error {
+func WriteUml(headers []map[string]string, tf bool) error {
 	file, err := os.OpenFile(util.PumlLocation.Path + "/tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	for i, v := range t {
+	for i, header := range headers {
 		if i == 0 {
 			fmt.Fprintln(file, "")
 		}
 
-		str := "\"" + v.SrcAddr + "\" -> \"" + v.DstAddr + "\" : ["+ v.Number + "][" + v.Protocol + "] " + v.Message
+		str := "\"" + header["srcAddr"] + "\" -> \"" + header["dstAddr"] + "\" : ["+ header["number"] + "][" + header["protocol"] + "] " + header["message"]
 		fmt.Fprintln(file, str)
 
 		if tf {
-			rnote := "rnote left: " + v.Time
+			rnote := "rnote left: " + header["time"]
 			fmt.Fprintln(file, rnote)
 		}
 	}

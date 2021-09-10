@@ -1,12 +1,8 @@
 package cmd
 
 import (
-	"os"
-	"fmt"
-	"strconv"
-	"strings"
 	"github.com/spf13/cobra"
-	"local.packages/cfg"
+	"local.packages/user"
 )
 
 type config struct {
@@ -40,59 +36,31 @@ func init() {
 	initCmd.Flags().BoolVar(&initConfig.validation, "validation-config", initConfig.validation, "Verify that the configuration settings are correct")
 
 	initCmd.RunE = func(cmd *cobra.Command, args []string) error {
+		var use user.ConfigUserMethod
+		use = user.ConfigUserSelection()
+
 		if initConfig.validation {
-			cfg.ValidationConfig()
+			use.Validate()
 			return nil
 		}
 
-		for i, v := range os.Args {
-			if strings.Contains(v, "feature-timestamp") && os.Args[i+1] == "false" {
-				initConfig.timestamp, _ = strconv.ParseBool(os.Args[i+1])
-			}
-
-			if strings.Contains(v, "feature-name-resolution") && os.Args[i+1] == "false" {
-				initConfig.nameResolution, _ = strconv.ParseBool(os.Args[i+1])
-			}
+		str := map[string]string{
+			"java":           initConfig.java,
+			"wireshark":      initConfig.wireshark,
+			"plantuml":       initConfig.plantuml,
 		}
 
-		if initConfig.java == "" {
-			initConfig.java = "default"
+		isbool := map[string]bool{
+			"timestamp":      initConfig.timestamp,
+			"nameResolution": initConfig.nameResolution,
 		}
 
-		if initConfig.wireshark == "" {
-			initConfig.wireshark = "default"
+		if err := use.SetArgs(str, isbool); err != nil {
+			return err
 		}
 
-		if initConfig.plantuml == "" {
-			initConfig.plantuml = "default"
-		}
-
-		InitConfig := cfg.Config{
-			Java:           initConfig.java,
-			Wireshark:      initConfig.wireshark,
-			Plantuml:       initConfig.plantuml,
-			Timestamp:      initConfig.timestamp,
-			NameResolution: initConfig.nameResolution,
-		}
-
-		if cfg.ExistInitConfig() {
-			if err := cfg.InitializeConfig(InitConfig); err != nil {
-				return err
-			}
-
-			fmt.Println("Create config file")
-
-		} else {
-			var a string
-			fmt.Printf("overwrite ? y or n: ")
-			fmt.Scan(&a)
-
-			if a == "y" {
-				if err := cfg.InitializeConfig(InitConfig); err != nil {
-					return err
-				}
-				fmt.Println("Overwrite!!")
-			}
+		if err := use.Writing(); err != nil {
+			return err
 		}
 		return nil
 	}

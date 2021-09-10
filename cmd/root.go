@@ -3,10 +3,8 @@ package cmd
 import (
 	"os"
 	"fmt"
-	"errors"
 	"github.com/spf13/cobra"
-	"local.packages/tshark"
-	"local.packages/uml"
+	"local.packages/user"
 )
 
 type params struct {
@@ -14,6 +12,7 @@ type params struct {
 	fileName  string
 	timeStamp bool
 	title     string
+	handson   bool
 }
 
 var rootCmd = &cobra.Command{}
@@ -26,7 +25,7 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Use = "pppc"
+	rootCmd.Use = "makeplantuml"
 	rootCmd.Short = "PCAP to PlantUML to PNG converter"
 
 	params := params{
@@ -34,39 +33,55 @@ func init() {
 		fileName:  "",
 		timeStamp: false,
 		title:     "",
+		handson:   false,
 	}
 
 	rootCmd.Flags().BoolVarP(&params.version, "version", "v", params.version, "Display version.")
 	rootCmd.Flags().StringVarP(&params.fileName, "filename", "f", params.fileName, "Target file name.")
 	rootCmd.Flags().BoolVarP(&params.timeStamp, "timestamp", "t", params.timeStamp, "Print a timestamp")
 	rootCmd.Flags().StringVar(&params.title, "puml-title", params.title, "Give PUML a title.")
+	rootCmd.Flags().BoolVar(&params.handson, "handson-environment", params.handson, "For captures acquired in hands-on environment.")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.version {
 			fmt.Println("version: 2.0.0")
-			os.Exit(0)
+			return nil
 		}
 
 		if params.fileName == "" {
 			return rootCmd.Help()
 		}
 
-		t := tshark.RunTshark(params.fileName)
-		if len(t) == 0 {
-			return errors.New("The result of tshark execution is not the expected value.")
+		var use user.UserMethod
+		if params.handson {
+			use = user.UserSelection(user.Handon())
+
+		} else {
+			use = user.UserSelection(user.Normal())
 		}
 
-		if err := uml.CreateTemplate(params.title); err != nil {
+		use.SetCmd()
+		use.SetArgs(params.fileName)
+
+		if err := use.RunE(); err != nil {
 			return err
 		}
 
-		tshark.NameResolution(t, "./profile/hosts")
-
-		if err := uml.WriteUml(t, params.timeStamp); err != nil {
+		use.Parse()
+		
+		if err := use.NameResE("./profile/hosts"); err != nil {
 			return err
 		}
 
-		if err := uml.RenderingUml(); err != nil {
+		if err := use.CreateE(params.title); err != nil {
+			return err
+		}
+
+		if err := use.WritingE(params.timeStamp); err != nil {
+			return err
+		}
+
+		if err := use.RenderingE(); err != nil {
 			return err
 		}
 		return nil
