@@ -54,11 +54,12 @@ func init() {
 
 		var use user.UserMethod
 		if params.handson {
-			use = user.UseTsharkSelection(user.Handon())
+			use = user.UserSelection(user.Handon())
 
 		} else {
-			use = user.UseTsharkSelection(user.Normal())
+			use = user.UserSelection(user.Normal())
 		}
+
 		use.SetCmd()
 		use.SetArgs(params.fileName)
 

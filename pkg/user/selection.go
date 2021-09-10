@@ -1,5 +1,11 @@
 package user
 
+func Config() Option {
+	return func(f *flags) {
+		f.i = 0
+	}
+}
+
 func Normal() Option {
 	return func(f *flags) {
 		f.i = 1
@@ -12,7 +18,7 @@ func Handon() Option {
 	}
 }
 
-func UseTsharkSelection(options ...Option) UserMethod {
+func UserSelection(options ...Option) UserMethod {
 	f := flags{i: 1}
 	for _, option := range options {
 		option(&f)
@@ -24,4 +30,15 @@ func UseTsharkSelection(options ...Option) UserMethod {
 		}
 	}
 	return normalUser{}.new()
+}
+
+func ConfigUserSelection(options ...Option) ConfigUserMethod {
+	f := flags{i: 0}
+	for _, option := range options {
+		option(&f)
+		if f.i == 0 {
+			return configOpeUser{}.new()
+		}
+	}
+	return configOpeUser{}.new()
 }

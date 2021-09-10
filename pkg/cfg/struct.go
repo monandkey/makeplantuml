@@ -37,3 +37,9 @@ type disassembledCharacter struct {
 	separate string
 	filename string
 }
+
+type ConfigMethod interface {
+	SetArgs(map[string]string, map[string]bool) error
+	Writing() error
+	Validate()
+}
