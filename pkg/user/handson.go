@@ -23,22 +23,22 @@ func (h *handsonUser) SetArgs(fileName string) {
 		"-T", "fields",
 		"-E", "separator=,",
 		"-E", "quote=d",
-		"-e", "frame.number",
-		"-e", "_ws.col.Time",
-		"-e", "ip.src",
-		"-e", "ipv6.src",
-		"-e", "udp.srcport",
-		"-e", "tcp.srcport",
-		"-e", "sctp.srcport",
-		"-e", "ip.dst",
-		"-e", "ipv6.dst",
-		"-e", "udp.dstport",
-		"-e", "tcp.dstport",
-		"-e", "sctp.dstport",
-		"-e", "_ws.col.Protocol",
-		"-e", "_ws.col.Info",
-		"-e", "ip.len",
-		"-e", "ipv6.plen",
+		"-e", "frame.number",     //  0
+		"-e", "_ws.col.Time",     //  1
+		"-e", "ip.src",           //  2
+		"-e", "ipv6.src",         //  3
+		"-e", "udp.srcport",      //  4
+		"-e", "tcp.srcport",      //  5
+		"-e", "sctp.srcport",     //  6
+		"-e", "ip.dst",           //  7
+		"-e", "ipv6.dst",         //  8
+		"-e", "udp.dstport",      //  9
+		"-e", "tcp.dstport",      // 10
+		"-e", "sctp.dstport",     // 11
+		"-e", "_ws.col.Protocol", // 12
+		"-e", "_ws.col.Info",     // 13
+		"-e", "ip.len",           // 14
+		"-e", "ipv6.plen",        // 15
 		"-d", "tcp.port==29000-30000,http2",
 	}
 }
