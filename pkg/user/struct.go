@@ -11,12 +11,16 @@ type UserMethod interface {
 	Display()
 }
 
-type normalUser struct {
+type baseUser struct {
 	tshark.TsharkArgs
 }
 
+type normalUser struct {
+	baseUser
+}
+
 type handsonUser struct {
-	tshark.TsharkArgs
+	normalUser
 }
 
 type flags struct {
