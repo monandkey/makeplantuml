@@ -24,6 +24,12 @@ func ToWriting() Option {
 	}
 }
 
+func FromRendering() Option {
+	return func(f *flags) {
+		f.i = 4
+	}
+}
+
 func UserSelection(options ...Option) UserMethod {
 	f := flags{i: 1}
 	for _, option := range options {
@@ -36,6 +42,9 @@ func UserSelection(options ...Option) UserMethod {
 
 		} else if f.i == 3 {
 			return toWritingUser{}.new()
+
+		} else if f.i == 4 {
+			return fromRenderingUser{}.new()
 		}
 	}
 	return normalUser{}.new()

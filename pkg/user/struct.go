@@ -28,6 +28,10 @@ type toWritingUser struct {
 	baseUser
 }
 
+type fromRenderingUser struct {
+	baseUser
+}
+
 
 type ConfigUserMethod interface {
 	cfg.ConfigMethod

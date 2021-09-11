@@ -8,12 +8,13 @@ import (
 )
 
 type params struct {
-	version   bool
-	fileName  string
-	timeStamp bool
-	title     string
-	handson   bool
-	toWriting bool
+	version       bool
+	fileName      string
+	timeStamp     bool
+	title         string
+	handson       bool
+	toWriting     bool
+	fromRendering bool
 }
 
 var rootCmd = &cobra.Command{}
@@ -30,12 +31,13 @@ func init() {
 	rootCmd.Short = "PCAP to PlantUML to PNG converter"
 
 	params := params{
-		version:   false,
-		fileName:  "",
-		timeStamp: false,
-		title:     "",
-		handson:   false,
-		toWriting: false,
+		version:       false,
+		fileName:      "",
+		timeStamp:     false,
+		title:         "",
+		handson:       false,
+		toWriting:     false,
+		fromRendering: false,
 	}
 
 	rootCmd.Flags().BoolVarP(&params.version, "version", "v", params.version, "Display version.")
@@ -44,6 +46,7 @@ func init() {
 	rootCmd.Flags().StringVar(&params.title, "puml-title", params.title, "Give PUML a title.")
 	rootCmd.Flags().BoolVar(&params.handson, "handson-environment", params.handson, "For captures acquired in hands-on environment.")
 	rootCmd.Flags().BoolVar(&params.toWriting, "create-puml", params.toWriting, "Creating a PUML file.")
+	rootCmd.Flags().BoolVar(&params.fromRendering, "rendering-puml", params.fromRendering, "Renders the specified PUML file.")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.version {
@@ -51,7 +54,7 @@ func init() {
 			return nil
 		}
 
-		if params.fileName == "" {
+		if params.fileName == "" && !(params.fromRendering) {
 			return rootCmd.Help()
 		}
 
@@ -61,6 +64,9 @@ func init() {
 		
 		} else if params.toWriting {
 			use = user.UserSelection(user.ToWriting())
+		
+		} else if params.fromRendering {
+			use = user.UserSelection(user.FromRendering())
 
 		} else {
 			use = user.UserSelection(user.Normal())
