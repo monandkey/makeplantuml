@@ -13,6 +13,7 @@ type params struct {
 	timeStamp bool
 	title     string
 	handson   bool
+	toWriting bool
 }
 
 var rootCmd = &cobra.Command{}
@@ -34,6 +35,7 @@ func init() {
 		timeStamp: false,
 		title:     "",
 		handson:   false,
+		toWriting: false,
 	}
 
 	rootCmd.Flags().BoolVarP(&params.version, "version", "v", params.version, "Display version.")
@@ -41,6 +43,7 @@ func init() {
 	rootCmd.Flags().BoolVarP(&params.timeStamp, "timestamp", "t", params.timeStamp, "Print a timestamp")
 	rootCmd.Flags().StringVar(&params.title, "puml-title", params.title, "Give PUML a title.")
 	rootCmd.Flags().BoolVar(&params.handson, "handson-environment", params.handson, "For captures acquired in hands-on environment.")
+	rootCmd.Flags().BoolVar(&params.toWriting, "create-puml", params.toWriting, "Creating a PUML file.")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.version {
@@ -55,6 +58,9 @@ func init() {
 		var use user.UserMethod
 		if params.handson {
 			use = user.UserSelection(user.Handon())
+		
+		} else if params.toWriting {
+			use = user.UserSelection(user.ToWriting())
 
 		} else {
 			use = user.UserSelection(user.Normal())
@@ -68,12 +74,12 @@ func init() {
 		}
 
 		use.Parse()
-		
-		if err := use.NameResE("./profile/hosts"); err != nil {
+
+		if err := use.CreateE(params.title); err != nil {
 			return err
 		}
 
-		if err := use.CreateE(params.title); err != nil {
+		if err := use.NameResE("./profile/hosts"); err != nil {
 			return err
 		}
 
