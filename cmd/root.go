@@ -15,6 +15,7 @@ type params struct {
 	handson       bool
 	toWriting     bool
 	fromRendering bool
+	pumlFile      string
 }
 
 var rootCmd = &cobra.Command{}
@@ -38,6 +39,7 @@ func init() {
 		handson:       false,
 		toWriting:     false,
 		fromRendering: false,
+		pumlFile:      "tmp.puml",
 	}
 
 	rootCmd.Flags().BoolVarP(&params.version, "version", "v", params.version, "Display version.")
@@ -47,6 +49,7 @@ func init() {
 	rootCmd.Flags().BoolVar(&params.handson, "handson-environment", params.handson, "For captures acquired in hands-on environment.")
 	rootCmd.Flags().BoolVar(&params.toWriting, "create-puml", params.toWriting, "Creating a PUML file.")
 	rootCmd.Flags().BoolVar(&params.fromRendering, "rendering-puml", params.fromRendering, "Renders the specified PUML file.")
+	rootCmd.Flags().StringVar(&params.pumlFile, "pumlfile", params.pumlFile, "Specify the rendered PUML file.")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.version {
