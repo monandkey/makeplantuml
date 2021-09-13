@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"os"
-	"fmt"
 	"github.com/spf13/cobra"
 	"local.packages/user"
 )
@@ -36,6 +35,7 @@ func init() {
 	rootCmd.Use = "makeplantuml"
 	rootCmd.Short = "PCAP to PlantUML to PNG converter"
 	rootCmd.Example = rootExample
+	rootCmd.Version = "2.0.0"
 
 	params := params{
 		version:       false,
@@ -58,11 +58,6 @@ func init() {
 	rootCmd.Flags().StringVar(&params.pumlFile, "puml-file", params.pumlFile, "Specify the rendered PUML file.")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		if params.version {
-			fmt.Println("version: 2.0.0")
-			return nil
-		}
-
 		if params.fileName == "" && !(params.fromRendering) {
 			return rootCmd.Help()
 		}
