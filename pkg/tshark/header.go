@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func SetAddress(v4 string, v6 string, lenv4 string, lenv6 string) string {
+func (t TsharkArgs) SetAddress(v4 string, v6 string, lenv4 string, lenv6 string) string {
 	v4 = regexp.MustCompile("\"").ReplaceAllString(v4, "")
 	v6 = regexp.MustCompile("\"").ReplaceAllString(v6, "")
 	lenv4 = regexp.MustCompile("\"").ReplaceAllString(lenv4, "")
@@ -79,27 +79,27 @@ func SetAddress(v4 string, v6 string, lenv4 string, lenv6 string) string {
 	return lines[0]["address"]
 }
 
-func SetPortAndCheckSum(u string, t string, s string) string {
-	u = regexp.MustCompile("\"").ReplaceAllString(u, "")
-	t = regexp.MustCompile("\"").ReplaceAllString(t, "")
-	s = regexp.MustCompile("\"").ReplaceAllString(s, "")
+func (t TsharkArgs) SetPortAndCheckSum(udp string, tcp string, sctp string) string {
+	udp = regexp.MustCompile("\"").ReplaceAllString(udp, "")
+	tcp = regexp.MustCompile("\"").ReplaceAllString(tcp, "")
+	sctp = regexp.MustCompile("\"").ReplaceAllString(sctp, "")
 
-	if u != "" && t == "" && s == "" {
-		return u
+	if udp != "" && tcp == "" && sctp == "" {
+		return udp
 	}
 
-	if u == "" && t != "" && s == "" {
-		return t
+	if udp == "" && tcp != "" && sctp == "" {
+		return tcp
 	}
 
-	if u == "" && t == "" && s != "" {
-		return s
+	if udp == "" && tcp == "" && sctp != "" {
+		return sctp
 	}
 
 	return ""
 }
 
-func SetMessage(msg string, protocol string) string {
+func (t TsharkArgs) SetMessage(msg string, protocol string) string {
 	msg = regexp.MustCompile("\"").ReplaceAllString(msg, "")
 
 	if protocol == "GTPv2" {

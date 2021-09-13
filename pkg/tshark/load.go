@@ -81,7 +81,7 @@ func NameOrNfSelection(name string, nf string) string {
 	return nf
 }
 
-func NameResolution(headers []map[string]string, hostsFile string) error {
+func (t TsharkArgs) NameResolution(headers []map[string]string, hostsFile string) error {
 	tmp, err := util.FileRead(hostsFile)
 	if err != nil {
 		return err
