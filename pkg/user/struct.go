@@ -14,6 +14,7 @@ type UserMethod interface {
 
 type baseUser struct {
 	tshark.TsharkArgs
+	uml.UmlArgs
 }
 
 type normalUser struct {

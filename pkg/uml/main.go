@@ -10,7 +10,7 @@ import (
 	"local.packages/cfg"
 )
 
-func CreateTemplate(t string) error {
+func (u UmlArgs) CreateTemplate(t string) error {
 	if util.PumlLocation.ValidateLocation() {
 		err := os.Mkdir(util.PumlLocation.Path, 0777)
 		if err != nil {
@@ -44,7 +44,7 @@ func CreateTemplate(t string) error {
 	return nil
 }
 
-func WriteUml(headers []map[string]string, tf bool) error {
+func (u UmlArgs) WriteUml(headers []map[string]string, tf bool) error {
 	file, err := os.OpenFile(util.PumlLocation.Path + "/tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
@@ -68,7 +68,7 @@ func WriteUml(headers []map[string]string, tf bool) error {
 	return nil
 }
 
-func RenderingUml(fileName string) error {
+func (u UmlArgs) RenderingUml(fileName string) error {
 	var (
 		cmd      string
 		plantuml string
