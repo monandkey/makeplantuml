@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"os/exec"
-	"local.packages/uml"
 )
 
 func (b *baseUser) SetCmd() {
@@ -93,21 +92,21 @@ func (b *baseUser) Display() {
 }
 
 func (b *baseUser) CreateE(title string) error {
-	if err := uml.CreateTemplate(title); err != nil {
+	if err := b.CreateTemplate(title); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (b *baseUser) WritingE(timestamp bool) error {
-	if err := uml.WriteUml(b.Header, timestamp); err != nil {
+	if err := b.WriteUml(b.Header, timestamp); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (b *baseUser) RenderingE(fileName string) error {
-	if err := uml.RenderingUml(fileName); err != nil {
+	if err := b.RenderingUml(fileName); err != nil {
 		return err
 	}
 	return nil
