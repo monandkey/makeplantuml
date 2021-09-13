@@ -68,7 +68,7 @@ func WriteUml(headers []map[string]string, tf bool) error {
 	return nil
 }
 
-func RenderingUml() error {
+func RenderingUml(fileName string) error {
 	var (
 		cmd      string
 		plantuml string
@@ -104,7 +104,7 @@ func RenderingUml() error {
 
 	out, _ := exec.Command(cmd,
 		"-jar", plantuml,
-		util.PumlLocation.Path + "/tmp.puml",
+		fileName,
 		"-o", "." + util.OutLocation.Path,
 		"-tsvg",
 	).CombinedOutput()

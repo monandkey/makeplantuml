@@ -107,8 +107,8 @@ func (b *baseUser) WritingE(timestamp bool) error {
 	return nil
 }
 
-func (b *baseUser) RenderingE() error {
-	if err := uml.RenderingUml(); err != nil {
+func (b *baseUser) RenderingE(fileName string) error {
+	if err := uml.RenderingUml(fileName); err != nil {
 		return err
 	}
 	return nil

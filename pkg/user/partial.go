@@ -4,7 +4,7 @@ func (t toWritingUser) new() UserMethod {
 	return &toWritingUser{}
 }
 
-func (t toWritingUser) RenderingE() error {
+func (t toWritingUser) RenderingE(fileName string) error {
 	return nil
 }
 

@@ -20,6 +20,11 @@ type params struct {
 
 var rootCmd = &cobra.Command{}
 
+const rootExample = `makeplantuml --version | --help |
+             --filename [filename] | [--puml-title [title]] | [--timestamp] | [--handson-environment] |
+             --filename [filename] --create-puml | [--puml-title [title]] | [--timestamp] | [--handson-environment] |
+             --rendering-puml | [--pumlfile [pumlfile]]`
+
 func Execute() {
 	err := rootCmd.Execute()
     if err != nil {
@@ -30,6 +35,7 @@ func Execute() {
 func init() {
 	rootCmd.Use = "makeplantuml"
 	rootCmd.Short = "PCAP to PlantUML to PNG converter"
+	rootCmd.Example = rootExample
 
 	params := params{
 		version:       false,
@@ -39,17 +45,17 @@ func init() {
 		handson:       false,
 		toWriting:     false,
 		fromRendering: false,
-		pumlFile:      "tmp.puml",
+		pumlFile:      "./puml/tmp.puml",
 	}
 
 	rootCmd.Flags().BoolVarP(&params.version, "version", "v", params.version, "Display version.")
-	rootCmd.Flags().StringVarP(&params.fileName, "filename", "f", params.fileName, "Target file name.")
+	rootCmd.Flags().StringVarP(&params.fileName, "filename", "f", params.fileName, "Target PCAP file name.")
 	rootCmd.Flags().BoolVarP(&params.timeStamp, "timestamp", "t", params.timeStamp, "Print a timestamp")
 	rootCmd.Flags().StringVar(&params.title, "puml-title", params.title, "Give PUML a title.")
 	rootCmd.Flags().BoolVar(&params.handson, "handson-environment", params.handson, "For captures acquired in hands-on environment.")
 	rootCmd.Flags().BoolVar(&params.toWriting, "create-puml", params.toWriting, "Creating a PUML file.")
 	rootCmd.Flags().BoolVar(&params.fromRendering, "rendering-puml", params.fromRendering, "Renders the specified PUML file.")
-	rootCmd.Flags().StringVar(&params.pumlFile, "pumlfile", params.pumlFile, "Specify the rendered PUML file.")
+	rootCmd.Flags().StringVar(&params.pumlFile, "puml-file", params.pumlFile, "Specify the rendered PUML file.")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.version {
@@ -96,7 +102,7 @@ func init() {
 			return err
 		}
 
-		if err := use.RenderingE(); err != nil {
+		if err := use.RenderingE(params.pumlFile); err != nil {
 			return err
 		}
 		return nil
