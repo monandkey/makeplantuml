@@ -5,11 +5,10 @@ import (
 	"regexp"
 	"os/exec"
 	"local.packages/uml"
-	"local.packages/tshark"
 )
 
 func (b *baseUser) SetCmd() {
-	b.Cmd = tshark.GetTsharkCommand()
+	b.Cmd = b.GetTsharkCommand()
 }
 
 func (b *baseUser) SetArgs(fileName string) {
@@ -49,10 +48,10 @@ func (b *baseUser) RunE() error {
 }
 
 func (b *baseUser) Parse() {
-	lines := tshark.ConvertOutputResultIntoArray(string(b.Out))
+	lines := b.ConvertOutputResultIntoArray(string(b.Out))
 
 	for _, line := range lines {
-		line = tshark.CleanLineStrings(line)
+		line = b.CleanLineStrings(line)
 
 		column := regexp.MustCompile("\".*?\"").FindAllStringSubmatch(line, -1)
 		if len(column) == 0 {
@@ -61,12 +60,12 @@ func (b *baseUser) Parse() {
 
 		tmpNumber := regexp.MustCompile("\"").ReplaceAllString(column[0][0], "")
 		tmpTime := regexp.MustCompile("\"").ReplaceAllString(column[1][0], "")
-		tmpSrcAddr := tshark.SetAddress(column[2][0], column[3][0], column[14][0], column[15][0])
-		tmpSrcPort := tshark.SetPortAndCheckSum(column[4][0], column[5][0], column[6][0])
-		tmpDstAddr := tshark.SetAddress(column[7][0], column[8][0], column[14][0], column[15][0])
-		tmpDstPort := tshark.SetPortAndCheckSum(column[9][0], column[10][0], column[11][0])
+		tmpSrcAddr := b.SetAddress(column[2][0], column[3][0], column[14][0], column[15][0])
+		tmpSrcPort := b.SetPortAndCheckSum(column[4][0], column[5][0], column[6][0])
+		tmpDstAddr := b.SetAddress(column[7][0], column[8][0], column[14][0], column[15][0])
+		tmpDstPort := b.SetPortAndCheckSum(column[9][0], column[10][0], column[11][0])
 		tmpProtocol := regexp.MustCompile("\"").ReplaceAllString(column[12][0], "")
-		tmpMessage := tshark.SetMessage(column[13][0], tmpProtocol)
+		tmpMessage := b.SetMessage(column[13][0], tmpProtocol)
 
 		tmph := map[string]string{
 			"number":   tmpNumber,
@@ -83,7 +82,7 @@ func (b *baseUser) Parse() {
 }
 
 func (b *baseUser) NameResE(fileName string) error {
-	if err := tshark.NameResolution(b.Header, fileName); err != nil {
+	if err := b.NameResolution(b.Header, fileName); err != nil {
 		return err
 	}
 	return nil
