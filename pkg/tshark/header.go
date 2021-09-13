@@ -4,6 +4,9 @@ import (
 	"regexp"
 	"strings"
 	"strconv"
+	"local.packages/s1ap"
+	"local.packages/ngap"
+	"local.packages/gtpv2"
 )
 
 func (t TsharkArgs) SetAddress(v4 string, v6 string, lenv4 string, lenv6 string) string {
@@ -136,3 +139,86 @@ func (t TsharkArgs) SetMessage(msg string, protocol string) string {
 	}
 	return msg
 }
+
+func delStrConvInt(str string) int {
+	str = regexp.MustCompile("\"").ReplaceAllString(str, "")
+	str = regexp.MustCompile(",.*$").ReplaceAllString(str, "")
+	i, _ := strconv.Atoi(str)
+	return i
+}
+
+func (t TsharkArgs) SetAnnotation(column [][]string) string {
+	tmpProtocol := column[12][0]
+
+	type s1apAnnotation struct {
+		type_of_id int
+		dcnr_cap   int
+	}
+
+	type ngapAnnotation struct {
+		type_id int
+	}
+
+	type gtpv2Annotation struct {
+		oi    int
+		si    int
+		dcnr  int
+		cause int
+	}
+
+	type pfcpAnnotation struct {
+		cause int
+	}
+
+	type diameterAnnotation struct {
+		resultCode int
+		CcReqType  int
+	}
+
+	s1apValue := s1apAnnotation{
+		type_of_id: delStrConvInt(column[16][0]),
+		dcnr_cap:   delStrConvInt(column[17][0]),
+	}
+
+	ngapValue := ngapAnnotation{
+		type_id: delStrConvInt(column[18][0]),
+	}
+
+	gtpv2Value := gtpv2Annotation{
+		oi:    delStrConvInt(column[19][0]),
+		si:    delStrConvInt(column[20][0]),
+		dcnr:  delStrConvInt(column[21][0]),
+		cause: delStrConvInt(column[22][0]),
+	}
+
+	// pfcpValue := pfcpAnnotation{
+	// 	cause: delStrConvInt(column[23][0]),
+	// }
+
+	// diameterValue := diameterAnnotation{
+	// 	resultCode: delStrConvInt(column[24][0]),
+	// 	CcReqType:  delStrConvInt(column[25][0]),
+	// }
+
+	if regexp.MustCompile("S1AP").Match([]byte(tmpProtocol)) {
+		typeOfId := s1ap.GetTypeOfId(s1apValue.type_of_id)
+		nasDcnr := s1ap.GetDcnr(s1apValue.dcnr_cap)
+		linking := typeOfId + nasDcnr
+		return linking
+	
+	} else if regexp.MustCompile("NGAP").Match([]byte(tmpProtocol)) {
+		typeOfId := ngap.GetTypeOfId(ngapValue.type_id)
+		linking := typeOfId
+		return linking
+	
+	} else if regexp.MustCompile("GTPv2").Match([]byte(tmpProtocol)) {
+		oi := gtpv2.GetOiIndication(gtpv2Value.oi)
+		si := gtpv2.GetSiIndication(gtpv2Value.si)
+		dcnr := gtpv2.GetDcnr(gtpv2Value.dcnr)
+		cause := gtpv2.GetCause(gtpv2Value.cause)
+		linking := oi + si + dcnr + cause
+		return linking
+	}
+	return ""
+}
+

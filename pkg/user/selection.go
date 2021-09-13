@@ -30,6 +30,12 @@ func FromRendering() Option {
 	}
 }
 
+func Annotatio() Option {
+	return func(f *flags) {
+		f.i = 5
+	}
+}
+
 func UserSelection(options ...Option) UserMethod {
 	f := flags{i: 1}
 	for _, option := range options {
@@ -45,6 +51,9 @@ func UserSelection(options ...Option) UserMethod {
 
 		} else if f.i == 4 {
 			return fromRenderingUser{}.new()
+		
+		} else if f.i == 5 {
+			return annotationUser{}.new()
 		}
 	}
 	return normalUser{}.new()
