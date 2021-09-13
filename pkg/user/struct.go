@@ -21,7 +21,15 @@ type normalUser struct {
 }
 
 type handsonUser struct {
-	normalUser
+	baseUser
+}
+
+type toWritingUser struct {
+	baseUser
+}
+
+type fromRenderingUser struct {
+	baseUser
 }
 
 

@@ -18,6 +18,18 @@ func Handon() Option {
 	}
 }
 
+func ToWriting() Option {
+	return func(f *flags) {
+		f.i = 3
+	}
+}
+
+func FromRendering() Option {
+	return func(f *flags) {
+		f.i = 4
+	}
+}
+
 func UserSelection(options ...Option) UserMethod {
 	f := flags{i: 1}
 	for _, option := range options {
@@ -27,6 +39,12 @@ func UserSelection(options ...Option) UserMethod {
 
 		} else if f.i == 2 {
 			return handsonUser{}.new()
+
+		} else if f.i == 3 {
+			return toWritingUser{}.new()
+
+		} else if f.i == 4 {
+			return fromRenderingUser{}.new()
 		}
 	}
 	return normalUser{}.new()
