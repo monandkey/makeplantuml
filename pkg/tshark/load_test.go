@@ -2,54 +2,49 @@ package tshark
 
 import (
 	"testing"
+	"local.packages/util"
 	"local.packages/tshark"
 )
 
+var inputN = []map[string]string{
+	{
+		"number":   "1", 
+		"time":     "2021-06-16 10:34:38.377646", 
+		"srcAddr":  "172.16.10.10", 
+		"srcPort":  "46571", 
+		"dstAddr":  "172.16.10.20", 
+		"dstPort":  "38412", 
+		"protocol": "NGAP/NAS-5GS", 
+		"message":  "InitialUEMessage, Registration request",
+	},
+}
+
 func TestNameResolution(t *testing.T) {
-	fileName := "/home/makeplantuml/container/sample/testattach.pcapng"
+	const fileName string = "/home/makeplantuml/container/sample/testattach.pcapng"
+
 	type Tests struct {
 		name   string
 		target string
-		args   tshark.TsharkHeaders
-		want   string
+		args   tshark.TsharkArgs
+		want   error
 	}
 
 	tests := Tests {
 		name: "Normal Case",
-		args: tshark.RunTshark(fileName),
-		want: "",
+		args: tshark.TsharkArgs{
+			Header: inputN,
+		},
+		want: nil,
 	}
 
+	util.PumlLocation.Path = "/home/makeplantuml/container/puml"
+
 	t.Run(tests.name, func(t *testing.T) {
-		tshark.NameResolution(tests.args, "../../profile/hosts")
-		for _, v := range tests.args {
-			if v.Number == tests.want {
-				t.Errorf("Number: This field is empty.")
-			}
-			if v.Time == tests.want {
-				t.Errorf("Time: This field is empty.")
-			}
-			if v.SrcAddr == tests.want {
-				t.Errorf("SrcAddr: This field is empty.")
-			}
-			if v.SrcPort == tests.want {
-				t.Errorf("SrcPort: This field is empty.")
-			}
-			if v.DstAddr == tests.want {
-				t.Errorf("DstAddr: This field is empty.")
-			}
-			if v.DstPort == tests.want {
-				t.Errorf("DstPort: This field is empty.")
-			}
-			if v.Protocol == tests.want {
-				t.Errorf("Protocol: This field is empty.")
-			}
-			if v.Message == tests.want {
-				t.Errorf("Message: This field is empty.")
-			}
-			if v.Checksum == tests.want {
-				t.Errorf("Checksum: This field is empty.")
-			}
+		cmd := tshark.TsharkArgs{}
+		res := cmd.NameResolution(tests.args.Header, "../../profile/hosts")
+
+		if res != tests.want {
+			t.Errorf("The return value is not expected.\nres: %s\n", res)
 		}
 	})
 }
