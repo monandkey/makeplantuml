@@ -6,7 +6,6 @@ import (
 	"local.packages/cfg"
 	"local.packages/uml"
 	"local.packages/util"
-	"local.packages/tshark"
 )
 
 func TestCreateTemplate(t *testing.T) {
@@ -31,7 +30,8 @@ func TestCreateTemplate(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.name, func(t *testing.T) {
-			if err := uml.CreateTemplate(v.args); err != v.want {
+			cmd := uml.UmlArgs{}
+			if err := cmd.CreateTemplate(v.args); err != v.want {
 				t.Errorf("err: %s\n", err)
 			}
 		})
@@ -46,7 +46,8 @@ func TestWriteUml(t *testing.T) {
 
 	type Tests struct {
 		name      string
-		args      tshark.TsharkHeaders
+		args      []map[string]string
+		mode      string
 		timestamp bool
 		want      error
 	}
@@ -54,37 +55,37 @@ func TestWriteUml(t *testing.T) {
 	tests := []Tests{
 		{
 			name: "Normal Case [No Timestamp]",
-			args: tshark.TsharkHeaders{
-				tshark.TsharkHeader{
-					Number:   "1",
-					Time:     "2021-06-16 10:34:38.377646",
-					SrcAddr:  "172.16.10.10",
-					SrcPort:  "46571",
-					DstAddr:  "172.16.10.20",
-					DstPort:  "38412",
-					Protocol: "NGAP/NAS-5GS",
-					Message:  "InitialUEMessage, Registration request",
-					Checksum: "0x527eec87",
+			args: []map[string]string{
+				{
+					"number":   "1",
+					"time":     "2021-06-16 10:34:38.377646",
+					"srcAddr":  "172.16.10.10",
+					"srcPort":  "46571",
+					"dstAddr":  "172.16.10.20",
+					"dstPort":  "38412",
+					"protocol": "NGAP/NAS-5GS",
+					"message":  "InitialUEMessage, Registration request",
 				},
 			},
+			mode: "normal",
 			timestamp: false,
 			want: nil,
 		},
 		{
 			name: "Normal Case [No Timestamp]",
-			args: tshark.TsharkHeaders{
-				tshark.TsharkHeader{
-					Number:   "2",
-					Time:     "2021-06-16 10:34:38.377646",
-					SrcAddr:  "10.244.166.179",
-					SrcPort:  "50718",
-					DstAddr:  "10.103.54.119",
-					DstPort:  "29510",
-					Protocol: "HTTP2",
-					Message:  "GET /nnrf-disc/v1/nf-instances",
-					Checksum: "0x0000f32b",
+			args: []map[string]string{
+				{
+					"number":   "2",
+					"time":     "2021-06-16 10:34:38.377646",
+					"srcAddr":  "10.244.166.179",
+					"srcPort":  "50718",
+					"dstAddr":  "10.103.54.119",
+					"dstPort":  "29510",
+					"protocol": "HTTP2",
+					"message":  "GET /nnrf-disc/v1/nf-instances",
 				},
 			},
+			mode: "normal",
 			timestamp: true,
 			want: nil,
 		},
@@ -92,7 +93,8 @@ func TestWriteUml(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.name, func(t *testing.T) {
-			if err := uml.WriteUml(v.args, v.timestamp); err != v.want {
+			cmd := uml.UmlArgs{}
+			if err := cmd.WriteUml(v.mode, v.args, v.timestamp); err != v.want {
 				t.Errorf("err: %s\n", err)
 			
 			} else {
@@ -111,27 +113,32 @@ func TestWriteUml(t *testing.T) {
 
 	errorTests := Tests{
 		name: "Error Case",
-		args: tshark.TsharkHeaders{
-			tshark.TsharkHeader{
-				Number:   "3",
-				Time:     "2021-06-16 10:34:38.592685",
-				SrcAddr:  "10.244.166.179",
-				SrcPort:  "50718",
-				DstAddr:  "10.244.166.129",
-				DstPort:  "29510",
-				Protocol: "HTTP2",
-				Message:  "200 OK",
-				Checksum: "0x000063c3",
+		args: []map[string]string{
+			{
+				"number":   "3",
+				"time":     "2021-06-16 10:34:38.592685",
+				"srcAddr":  "10.244.166.179",
+				"srcPort":  "50718",
+				"dstAddr":  "10.244.166.129",
+				"dstPort":  "29510",
+				"protocol": "HTTP2",
+				"message":  "200 OK",
 			},
 		},
+		mode: "normal",
 		timestamp: false,
 		want: nil,
 	}
 
 	t.Run(errorTests.name, func(t *testing.T) {
-		if err := uml.WriteUml(errorTests.args, errorTests.timestamp); err == errorTests.want {
-			t.Errorf("The expectation is that it will fail because the target file does not exist.\n")
+		tmp := util.PumlLocation.Path
+		util.PumlLocation.Path = "/rooot"
+
+		cmd := uml.UmlArgs{}
+		if err := cmd.WriteUml(errorTests.mode, errorTests.args, errorTests.timestamp); err == errorTests.want {
+			t.Errorf("The expectation is that it will fail because the target file does not exist.\nerr: %s", err)
 		}
+		util.PumlLocation.Path = tmp
 	})
 }
 
@@ -144,25 +151,26 @@ func TestRenderingUml(t *testing.T) {
 
 	type Tests struct {
 		name string
-		args tshark.TsharkHeaders
+		args []map[string]string
+		file string
 		want error
 	}
 
 	tests := Tests{
 		name: "Normal Case",
-		args: tshark.TsharkHeaders{
-			tshark.TsharkHeader{
-				Number:   "1",
-				Time:     "2021-06-16 10:34:38.377646",
-				SrcAddr:  "172.16.10.10",
-				SrcPort:  "46571",
-				DstAddr:  "172.16.10.20",
-				DstPort:  "38412",
-				Protocol: "NGAP/NAS-5GS",
-				Message:  "InitialUEMessage, Registration request",
-				Checksum: "0x527eec87",
+		args: []map[string]string{
+			{
+				"number":   "1",
+				"time":     "2021-06-16 10:34:38.377646",
+				"srcAddr":  "172.16.10.10",
+				"srcPort":  "46571",
+				"dstAddr":  "172.16.10.20",
+				"dstPort":  "38412",
+				"protocol": "NGAP/NAS-5GS",
+				"message":  "InitialUEMessage, Registration request",
 			},
 		},
+		file: "/home/makeplantuml/container/puml/tmp.puml",
 		want: nil,
 	}
 
@@ -174,7 +182,8 @@ func TestRenderingUml(t *testing.T) {
 		}
 		fmt.Println(res)
 
-		if err := uml.RenderingUml(); err != tests.want {
+		cmd := uml.UmlArgs{}
+		if err := cmd.RenderingUml(tests.file); err != tests.want {
 			t.Errorf("Failed to render the puml file.\nerr: %s\n", err)
 		}
 	})
@@ -185,24 +194,25 @@ func TestRenderingUml(t *testing.T) {
 
 	tests = Tests{
 		name: "Error Case",
-		args: tshark.TsharkHeaders{
-			tshark.TsharkHeader{
-				Number:   "1",
-				Time:     "2021-06-16 10:34:38.377646",
-				SrcAddr:  "172.16.10.10",
-				SrcPort:  "46571",
-				DstAddr:  "172.16.10.20",
-				DstPort:  "38412",
-				Protocol: "NGAP/NAS-5GS",
-				Message:  "InitialUEMessage, Registration request",
-				Checksum: "0x527eec87",
+		args: []map[string]string{
+			{
+				"number":   "1",
+				"time":     "2021-06-16 10:34:38.377646",
+				"srcAddr":  "172.16.10.10",
+				"srcPort":  "46571",
+				"dstAddr":  "172.16.10.20",
+				"dstPort":  "38412",
+				"protocol": "NGAP/NAS-5GS",
+				"message":  "InitialUEMessage, Registration request",
 			},
 		},
+		file: "/home/makeplantuml/container/puml/tmp",
 		want: nil,
 	}
 
 	t.Run(tests.name, func(t *testing.T) {
-		if err := uml.RenderingUml(); err == tests.want {
+		cmd := uml.UmlArgs{}
+		if err := cmd.RenderingUml(tests.file); err == tests.want {
 			t.Errorf("It is assumed that an error will be output because the target file does not exist.\nerr: %s\n", err)
 		}
 	})
@@ -212,14 +222,15 @@ func TestRenderingUml(t *testing.T) {
 	}
 }
 
-func preparationRendering(t *testing.T, args tshark.TsharkHeaders) {
+func preparationRendering(t *testing.T, args []map[string]string) {
 	cfg.Param.Profile.Path.Plantuml = cfg.PlantumlLongPath
 
-	if err := uml.CreateTemplate(""); err != nil {
+	cmd := uml.UmlArgs{}
+	if err := cmd.CreateTemplate(""); err != nil {
 		t.Errorf("Failed to create template.\nerr: %s\n", err)
 	}
 
-	if err := uml.WriteUml(args, false); err != nil {
+	if err := cmd.WriteUml("normal", args, false); err != nil {
 		t.Errorf("Writing to the puml file failed.\nerr: %s\n", err)
 	}
 
