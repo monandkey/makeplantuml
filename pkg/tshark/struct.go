@@ -1,15 +1,16 @@
 package tshark
 
-type TsharkHeaders []TsharkHeader
+type TsharkArgs struct {
+	Cmd    string
+	Args   []string
+	Out    []byte
+	Header []map[string]string
+}
 
-type TsharkHeader struct {
-	Number   string
-	Time     string
-	SrcAddr  string
-	SrcPort  string
-	DstAddr  string
-	DstPort  string
-	Protocol string
-	Message  string
-	Checksum string
+type TsharkMethod interface {
+	SetCmd()
+	SetArgs(string)
+	RunE() error
+	Parse()
+	NameResE(string) error
 }

@@ -49,15 +49,15 @@ func hostInfoFormating(h string) []map[string]string {
 	return hosts
 }
 
-func checkResolution(r []string, t string, f string) []string {
+func checkResolution(r []string, t string, f string) ([]string, error) {
 	for _, v := range r {
 		if v == t {
-			return r
+			return r, nil
 		}
 	}
 	file, err := os.OpenFile(util.PumlLocation.Path + "/tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		fmt.Println(err)
+		return []string{}, err
 	}
 	defer file.Close()
 
@@ -71,7 +71,7 @@ func checkResolution(r []string, t string, f string) []string {
 	} 
 
 	r = append(r, t)
-	return r
+	return r, nil
 }
 
 func NameOrNfSelection(name string, nf string) string {
@@ -81,10 +81,10 @@ func NameOrNfSelection(name string, nf string) string {
 	return nf
 }
 
-func NameResolution(t TsharkHeaders, hostsFile string) {
+func (t TsharkArgs) NameResolution(headers []map[string]string, hostsFile string) error {
 	tmp, err := util.FileRead(hostsFile)
 	if err != nil {
-		return
+		return err
 	}
 
 	hosts := hostInfoFormating(tmp)
@@ -92,40 +92,53 @@ func NameResolution(t TsharkHeaders, hostsFile string) {
 	var resolvedAddress []string
 	for _, host := range hosts {
 		label1:
-		for i, v := range t {
-			if v.SrcAddr == host["address"] && v.SrcPort == host["port"] {
-				t[i].SrcAddr = NameOrNfSelection(host["name"], host["nf"])
-				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
+		for i, header := range headers {
+			if header["srcAddr"] == host["address"] && header["srcPort"] == host["port"] {
+				headers[i]["srcAddr"] = NameOrNfSelection(host["name"], host["nf"])
+				resolvedAddress, err = checkResolution(resolvedAddress, host["name"], host["nf"])
+				if err != nil {
+					return err
+				}
 				continue
 			}
 
-			if v.DstAddr == host["address"] && v.DstPort == host["port"] {
-				t[i].DstAddr = NameOrNfSelection(host["name"], host["nf"])
-				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
+			if header["dstAddr"] == host["address"] && header["dstPort"] == host["port"] {
+				headers[i]["dstAddr"] = NameOrNfSelection(host["name"], host["nf"])
+				resolvedAddress, err = checkResolution(resolvedAddress, host["name"], host["nf"])
+				if err != nil {
+					return err
+				}
 				continue
 			}
 
 			for _, w := range hosts {
-				if host["address"] == w["address"] && v.SrcPort == w["port"] && host["port"] != "" && host["name"] != w["name"] {
+				if host["address"] == w["address"] && header["srcPort"] == w["port"] && host["port"] != "" && host["name"] != w["name"] {
 					break label1
 				}
 
-				if host["address"] == w["address"] && v.DstPort == w["port"] && host["port"] != "" && host["name"] != w["name"] {
+				if host["address"] == w["address"] && header["dstPort"] == w["port"] && host["port"] != "" && host["name"] != w["name"] {
 					break label1
 				}
 			}
 
-			if v.SrcAddr == host["address"] {
-				t[i].SrcAddr = NameOrNfSelection(host["name"], host["nf"])
-				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
+			if header["srcAddr"] == host["address"] {
+				headers[i]["srcAddr"] = NameOrNfSelection(host["name"], host["nf"])
+				resolvedAddress, err = checkResolution(resolvedAddress, host["name"], host["nf"])
+				if err != nil {
+					return err
+				}
 				continue
 			}
 
-			if v.DstAddr == host["address"] {
-				t[i].DstAddr = NameOrNfSelection(host["name"], host["nf"])
-				resolvedAddress = checkResolution(resolvedAddress, host["name"], host["nf"])
+			if header["dstAddr"] == host["address"] {
+				headers[i]["dstAddr"] = NameOrNfSelection(host["name"], host["nf"])
+				resolvedAddress, err = checkResolution(resolvedAddress, host["name"], host["nf"])
+				if err != nil {
+					return err
+				}
 				continue
 			}
 		}
 	}
+	return nil
 }

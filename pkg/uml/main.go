@@ -2,16 +2,14 @@ package uml
 
 import (
 	"os"
-	"fmt"
 	"errors"
 	"runtime"
 	"os/exec"
 	"local.packages/util"
-	"local.packages/tshark"
 	"local.packages/cfg"
 )
 
-func CreateTemplate(t string) error {
+func (u UmlArgs) CreateTemplate(t string) error {
 	if util.PumlLocation.ValidateLocation() {
 		err := os.Mkdir(util.PumlLocation.Path, 0777)
 		if err != nil {
@@ -45,31 +43,7 @@ func CreateTemplate(t string) error {
 	return nil
 }
 
-func WriteUml(t tshark.TsharkHeaders, tf bool) error {
-	file, err := os.OpenFile(util.PumlLocation.Path + "/tmp.puml", os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	for i, v := range t {
-		if i == 0 {
-			fmt.Fprintln(file, "")
-		}
-
-		str := "\"" + v.SrcAddr + "\" -> \"" + v.DstAddr + "\" : ["+ v.Number + "][" + v.Protocol + "] " + v.Message
-		fmt.Fprintln(file, str)
-
-		if tf {
-			rnote := "rnote left: " + v.Time
-			fmt.Fprintln(file, rnote)
-		}
-	}
-	fmt.Fprintln(file, "\n@enduml")
-	return nil
-}
-
-func RenderingUml() error {
+func (u UmlArgs) RenderingUml(fileName string) error {
 	var (
 		cmd      string
 		plantuml string
@@ -105,7 +79,7 @@ func RenderingUml() error {
 
 	out, _ := exec.Command(cmd,
 		"-jar", plantuml,
-		util.PumlLocation.Path + "/tmp.puml",
+		fileName,
 		"-o", "." + util.OutLocation.Path,
 		"-tsvg",
 	).CombinedOutput()
