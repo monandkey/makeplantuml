@@ -7,6 +7,8 @@ import (
 	"local.packages/s1ap"
 	"local.packages/ngap"
 	"local.packages/gtpv2"
+	"local.packages/pfcp"
+	"local.packages/diameter"
 )
 
 func (t TsharkArgs) SetAddress(v4 string, v6 string, lenv4 string, lenv6 string) string {
@@ -172,7 +174,7 @@ func (t TsharkArgs) SetAnnotation(column [][]string) string {
 
 	type diameterAnnotation struct {
 		resultCode int
-		CcReqType  int
+		ccReqType  int
 	}
 
 	s1apValue := s1apAnnotation{
@@ -191,14 +193,14 @@ func (t TsharkArgs) SetAnnotation(column [][]string) string {
 		cause: delStrConvInt(column[22][0]),
 	}
 
-	// pfcpValue := pfcpAnnotation{
-	// 	cause: delStrConvInt(column[23][0]),
-	// }
+	pfcpValue := pfcpAnnotation{
+		cause: delStrConvInt(column[23][0]),
+	}
 
-	// diameterValue := diameterAnnotation{
-	// 	resultCode: delStrConvInt(column[24][0]),
-	// 	CcReqType:  delStrConvInt(column[25][0]),
-	// }
+	diameterValue := diameterAnnotation{
+		resultCode: delStrConvInt(column[24][0]),
+		ccReqType:  delStrConvInt(column[25][0]),
+	}
 
 	if regexp.MustCompile("S1AP").Match([]byte(tmpProtocol)) {
 		typeOfId := s1ap.GetTypeOfId(s1apValue.type_of_id)
@@ -217,6 +219,17 @@ func (t TsharkArgs) SetAnnotation(column [][]string) string {
 		dcnr := gtpv2.GetDcnr(gtpv2Value.dcnr)
 		cause := gtpv2.GetCause(gtpv2Value.cause)
 		linking := oi + si + dcnr + cause
+		return linking
+	
+	} else if regexp.MustCompile("PFCP").Match([]byte(tmpProtocol)) {
+		cause := pfcp.GetCause(pfcpValue.cause)
+		linking := cause
+		return linking
+	
+	} else if regexp.MustCompile("DIAMETER").Match([]byte(tmpProtocol)) {
+		resultCode := diameter.GetResultCode(diameterValue.resultCode)
+		ccReqType := diameter.GetCCRequestType(diameterValue.ccReqType)
+		linking := resultCode + ccReqType
 		return linking
 	}
 	return ""
