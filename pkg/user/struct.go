@@ -33,6 +33,10 @@ type fromRenderingUser struct {
 	baseUser
 }
 
+type annotationUser struct {
+	baseUser
+}
+
 
 type ConfigUserMethod interface {
 	cfg.ConfigMethod

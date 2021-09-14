@@ -15,13 +15,14 @@ type params struct {
 	toWriting     bool
 	fromRendering bool
 	pumlFile      string
+	annotation    bool
 }
 
 var rootCmd = &cobra.Command{}
 
 const rootExample = `makeplantuml --version | --help |
-             --filename [filename] | [--puml-title [title]] | [--timestamp] | [--handson-environment] |
-             --filename [filename] --create-puml | [--puml-title [title]] | [--timestamp] | [--handson-environment] |
+             --filename [filename] | --puml-title [title] | --timestamp | [--handson-environment] | [--inserting-annotations] |
+             --filename [filename] --create-puml | --puml-title [title] | --timestamp | [--handson-environment] | [--inserting-annotations] |
              --rendering-puml | [--pumlfile [pumlfile]]`
 
 func Execute() {
@@ -46,6 +47,7 @@ func init() {
 		toWriting:     false,
 		fromRendering: false,
 		pumlFile:      "./puml/tmp.puml",
+		annotation:     false,
 	}
 
 	rootCmd.Flags().BoolVarP(&params.version, "version", "v", params.version, "Display version.")
@@ -56,6 +58,7 @@ func init() {
 	rootCmd.Flags().BoolVar(&params.toWriting, "create-puml", params.toWriting, "Creating a PUML file.")
 	rootCmd.Flags().BoolVar(&params.fromRendering, "rendering-puml", params.fromRendering, "Renders the specified PUML file.")
 	rootCmd.Flags().StringVar(&params.pumlFile, "puml-file", params.pumlFile, "Specify the rendered PUML file.")
+	rootCmd.Flags().BoolVar(&params.annotation, "inserting-annotations", params.annotation, "Adding annotations to messages.")
 
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if params.fileName == "" && !(params.fromRendering) {
@@ -71,6 +74,9 @@ func init() {
 		
 		} else if params.fromRendering {
 			use = user.UserSelection(user.FromRendering())
+
+		} else if params.annotation {
+			use = user.UserSelection(user.Annotatio())
 
 		} else {
 			use = user.UserSelection(user.Normal())
