@@ -2,44 +2,92 @@ package tshark
 
 import (
 	"testing"
+	"local.packages/cfg"
 	"local.packages/tshark"
 )
 
 
-func TestRunTshark(t *testing.T) {
+func TestGetTsharkCommand(t *testing.T) {
 	type Tests struct {
 		name string
-		args string
-		want int
+		want string
 	}
 
 	tests := Tests {
 		name: "Normal Case",
-		args: "/home/makeplantuml/container/sample/testattach.pcapng",
-		want: 17,
+		want: "tshark",
 	}
 
 	t.Run(tests.name, func(t *testing.T) {
-		got := tshark.RunTshark(tests.args)
-		if len(got) == 0 {
-			t.Errorf("The return value is zero.\nReturn Value: %d", len(got))
-
-		} else if (len(got) % tests.want) == 0 {
-			t.Errorf("The return value is not the expected value.\nValue: %d", len(got))
+		cmd := tshark.TsharkArgs{}
+		res := cmd.GetTsharkCommand()
+		if res != tests.want {
+			t.Errorf("The result is not the expected value.")
 		}
 	})
 
 	tests = Tests {
-			name: "Error Case",
-			args: "sample/testattach.pcapng",
-			want: 0,
+			name: "Not Default",
+			want: "/usr/bin/tshark\\tshark.exe",
 	}
 
+	cfg.Param.Profile.Path.Wireshark = "/usr/bin/tshark"
+
 	t.Run(tests.name, func(t *testing.T) {
-		got := tshark.RunTshark(tests.args)
-		if len(got) != tests.want {
-			t.Errorf("The expected value is zero.")
+		cmd := tshark.TsharkArgs{}
+		res := cmd.GetTsharkCommand()
+		if res != tests.want {
+			t.Errorf("The result is not the expected value.")
 		}
 	})
 }
 
+func TestConvertOutputResultIntoArray(t *testing.T) {
+	const out string = `"1","2021-06-16 10:34:38.377646","172.16.10.10",,,,"46571","172.16.10.20",,,,"38412","NGAP/NAS-5GS","InitialUEMessage, Registration request",,"0x527eec87",,"124",`
+	const exe string = `"1","2021-06-16 10:34:38.377646","172.16.10.10","","","","46571","172.16.10.20","","","","38412","NGAP/NAS-5GS","InitialUEMessage, Registration request","","0x527eec87","","124",`
+
+	type Tests struct {
+		name string
+		args string
+		want string
+	}
+
+	tests := Tests{
+		name: "Normal Case",
+		args: out,
+		want: exe,
+	}
+
+	t.Run(tests.name, func(t *testing.T) {
+		cmd := tshark.TsharkArgs{}
+		res := cmd.ConvertOutputResultIntoArray(tests.args)
+		if res[0] != tests.want {
+			t.Errorf("The replacement result is not the expected value..")
+		}
+	})
+}
+
+func TestCleanLineStrings(t *testing.T) {
+	const out string = `"1","2021-06-16 10:34:38.377646","172.16.10.10","","","","46571","172.16.10.20","","","","38412","NGAP/NAS-5GS","InitialUEMessage, Registration request","","0x527eec87","","124",`
+	const exe string = `"1","2021-06-16 10:34:38.377646","172.16.10.10","","","","46571","172.16.10.20","","","","38412","NGAP/NAS-5GS","InitialUEMessage, Registration request","","0x527eec87","","124",""`
+
+	type Tests struct {
+		name string
+		args string
+		want string
+	}
+
+	tests := Tests{
+		name: "Normal Case",
+		args: out,
+		want: exe,
+	}
+
+	t.Run(tests.name, func(t *testing.T) {
+		cmd := tshark.TsharkArgs{}
+		res := cmd.CleanLineStrings(tests.args)
+		if res != tests.want {
+			t.Errorf("The replacement result is not the expected value.")
+		}
+	})
+}

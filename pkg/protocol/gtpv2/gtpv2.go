@@ -139,7 +139,7 @@ func GetSiIndication(id int) string {
 	}
 
 	if id == 1 {
-		return "OI: " + gtpv2_si[id] + "\\n"
+		return "SI: " + gtpv2_si[id] + "\\n"
 	}
 	
 	return ""
