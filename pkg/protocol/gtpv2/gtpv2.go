@@ -98,7 +98,7 @@ func GetCause(id int) string {
 	}
 
 	if _, ok := gtpv2_cause[id]; ok {
-		return "Cause: " + gtpv2_cause[id] + "\n"
+		return "Cause: " + gtpv2_cause[id] + "\\n"
 	}
 	return ""
 }
@@ -111,7 +111,7 @@ func GetDcnr(id int) string {
 	}
 
 	if id == 1 {
-		return "DCNR: " + gtpv2_dcnr[id] + "\n"
+		return "DCNR: " + gtpv2_dcnr[id] + "\\n"
 	}
 	
 	return ""
@@ -125,7 +125,7 @@ func GetOiIndication(id int) string {
 	}
 
 	if id == 1 {
-		return "OI: " + gtpv2_oi[id] + "\n"
+		return "OI: " + gtpv2_oi[id] + "\\n"
 	}
 	
 	return ""
@@ -139,7 +139,7 @@ func GetSiIndication(id int) string {
 	}
 
 	if id == 1 {
-		return "OI: " + gtpv2_si[id] + "\n"
+		return "OI: " + gtpv2_si[id] + "\\n"
 	}
 	
 	return ""

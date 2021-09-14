@@ -31,6 +31,6 @@ func GetCause(id int) string {
 	if id == 0 {
 		return ""
 	}
-	return "Cause: " + pfcp_cause[id] + "\n"
+	return "Cause: " + pfcp_cause[id] + "\\n"
 }
 

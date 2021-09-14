@@ -149,6 +149,11 @@ func delStrConvInt(str string) int {
 	return i
 }
 
+func delEndLinefedd(str string) string {
+	str = regexp.MustCompile("\\\\n$").ReplaceAllString(str, "")
+	return str
+}
+
 func (t TsharkArgs) SetAnnotation(column [][]string) string {
 	tmpProtocol := column[12][0]
 
@@ -206,12 +211,12 @@ func (t TsharkArgs) SetAnnotation(column [][]string) string {
 		typeOfId := s1ap.GetTypeOfId(s1apValue.type_of_id)
 		nasDcnr := s1ap.GetDcnr(s1apValue.dcnr_cap)
 		linking := typeOfId + nasDcnr
-		return linking
+		return delEndLinefedd(linking)
 	
 	} else if regexp.MustCompile("NGAP").Match([]byte(tmpProtocol)) {
 		typeOfId := ngap.GetTypeOfId(ngapValue.type_id)
 		linking := typeOfId
-		return linking
+		return delEndLinefedd(linking)
 	
 	} else if regexp.MustCompile("GTPv2").Match([]byte(tmpProtocol)) {
 		oi := gtpv2.GetOiIndication(gtpv2Value.oi)
@@ -219,18 +224,18 @@ func (t TsharkArgs) SetAnnotation(column [][]string) string {
 		dcnr := gtpv2.GetDcnr(gtpv2Value.dcnr)
 		cause := gtpv2.GetCause(gtpv2Value.cause)
 		linking := oi + si + dcnr + cause
-		return linking
+		return delEndLinefedd(linking)
 	
 	} else if regexp.MustCompile("PFCP").Match([]byte(tmpProtocol)) {
 		cause := pfcp.GetCause(pfcpValue.cause)
 		linking := cause
-		return linking
+		return delEndLinefedd(linking)
 	
 	} else if regexp.MustCompile("DIAMETER").Match([]byte(tmpProtocol)) {
 		resultCode := diameter.GetResultCode(diameterValue.resultCode)
 		ccReqType := diameter.GetCCRequestType(diameterValue.ccReqType)
 		linking := resultCode + ccReqType
-		return linking
+		return delEndLinefedd(linking)
 	}
 	return ""
 }

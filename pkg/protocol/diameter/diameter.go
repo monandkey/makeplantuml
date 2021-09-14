@@ -55,7 +55,7 @@ func GetResultCode(id int) string {
 	}
 
 	if _, ok := diameter_result_code[id]; ok {
-		return "Cause: " + diameter_result_code[id] + "\n"
+		return "Cause: " + diameter_result_code[id] + "\\n"
 	}
 	return ""
 }
@@ -69,7 +69,7 @@ func GetCCRequestType(id int) string {
 	}
 
 	if _, ok := diameter_cc_request_type[id]; ok {
-		return "CC-Request-Type: " + diameter_cc_request_type[id] + "\n"
+		return "CC-Request-Type: " + diameter_cc_request_type[id] + "\\n"
 	}
 	return ""
 }

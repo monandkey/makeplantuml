@@ -57,14 +57,20 @@ func (u UmlArgs) WriteUmlAnnotatio(headers []map[string]string, tf bool) error {
 			fmt.Fprintln(file, "")
 		}
 
-		str := "\"" + header["srcAddr"] + "\" -> \"" + header["dstAddr"] + "\" : ["+ header["number"] + "][" + header["protocol"] + "] " + header["message"]
-		fmt.Fprintln(file, str)
-		
 		if header["annotation"] != "" {
-			file.Write(([]byte)("note right of " + header["srcAddr"] + "\n"))
-			file.Write(([]byte)(header["annotation"] + "\n"))
-			file.Write(([]byte)("end note\n"))
-		}
+			str := "\"" + header["srcAddr"] + "\" -> \"" + header["dstAddr"] + "\" : ["+ header["number"] + "][" + header["protocol"] + "] " + header["message"] + "\\n" + header["annotation"]
+			fmt.Fprintln(file, str)
+
+		} else {
+			str := "\"" + header["srcAddr"] + "\" -> \"" + header["dstAddr"] + "\" : ["+ header["number"] + "][" + header["protocol"] + "] " + header["message"]
+			fmt.Fprintln(file, str)
+		} 
+
+		// if header["annotation"] != "" {
+		// 	file.Write(([]byte)("note right of " + header["srcAddr"] + "\n"))
+		// 	file.Write(([]byte)(header["annotation"] + "\n"))
+		// 	file.Write(([]byte)("end note\n"))
+		// }
 
 		if tf {
 			rnote := "rnote left: " + header["time"]

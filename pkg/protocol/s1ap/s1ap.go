@@ -14,7 +14,7 @@ func GetTypeOfId(id int) string {
 	}
 
 	if id != 0 {
-		return "Attach type: " + eps_type_of_identity[id] + "\n"
+		return "Attach type: " + eps_type_of_identity[id] + "\\n"
 		
 	}
 	return ""
@@ -28,7 +28,7 @@ func GetDcnr(id int) string {
 	}
 
 	if id == 1 {
-		return "DCNR: " + nas_epc_emm_dcnr_cap[id] + "\n"
+		return "DCNR: " + nas_epc_emm_dcnr_cap[id] + "\\n"
 	}
 	
 	return ""

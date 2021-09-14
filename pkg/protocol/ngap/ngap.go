@@ -51,7 +51,7 @@ func GetCause(id int) string {
 	}
 
 	if _, ok := fgs_emm_cause[id]; ok {
-		return "Cause: " + fgs_emm_cause[id] + "\n"
+		return "Cause: " + fgs_emm_cause[id] + "\\n"
 	}
 	return ""
 }
@@ -70,7 +70,7 @@ func GetTypeOfId(id int) string {
 	}
 
 	if id != 0 {
-		return "Attach type: " + fgs_type_of_identity[id] + "\n"
+		return "Attach type: " + fgs_type_of_identity[id] + "\\n"
 	}
 	return ""
 }
