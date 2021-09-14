@@ -97,7 +97,8 @@ func TestSetAddress(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.name, func(t *testing.T) {
-			res := tshark.SetAddress(v.args.v4, v.args.v6, v.args.lenv4, v.args.lenv6)
+			cmd := tshark.TsharkArgs{}
+			res := cmd.SetAddress(v.args.v4, v.args.v6, v.args.lenv4, v.args.lenv6)
 			if res != v.want {
 				t.Errorf("The return value is not the expected value.\nres: %s\n", res)
 			}
@@ -159,7 +160,8 @@ func TestSetSetPortAndCheckSum(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.name, func(t *testing.T) {
-			res := tshark.SetPortAndCheckSum(v.args.udp, v.args.tcp, v.args.sctp)
+			cmd := tshark.TsharkArgs{}
+			res := cmd.SetPortAndCheckSum(v.args.udp, v.args.tcp, v.args.sctp)
 			if res != v.want {
 				t.Errorf("The return value is not the expected value.")
 			}
@@ -376,7 +378,8 @@ func TestSetMessage(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.name, func(t *testing.T) {
-			res := tshark.SetMessage(v.args.message, v.args.protocol)
+			cmd := tshark.TsharkArgs{}
+			res := cmd.SetMessage(v.args.message, v.args.protocol)
 			if res != v.want {
 				t.Errorf("The return value is not the expected value.\n %s", res)
 			}
@@ -384,55 +387,318 @@ func TestSetMessage(t *testing.T) {
 	}
 }
 
-func TestSetHeader(t *testing.T) {
-	var fmtOut tshark.TsharkHeaders
-
+func TestSetAnnotation(t *testing.T) {
 	type Tests struct {
 		name   string
-		args   string
+		args   [][]string
 		want   string
 	}
 
-	tests := Tests {
-		name: "Normal Case",
-		args: expOut,
-		want: "",
+	tests := []Tests{
+		{
+			name: "S1AP Type of id",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"S1AP"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"1"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "Attach type: IMSI",
+		},
+		{
+			name: "S1AP DCNR",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"S1AP"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"1"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "DCNR: supported",
+		},
+		{
+			name: "S1AP Type of id and DCNR",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"S1AP"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"1"}, // 16
+				{"1"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "Attach type: IMSI\\nDCNR: supported",
+		},
+		{
+			name: "NGAP Type of id",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"NGAP/NAS-5GS"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"1"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "Attach type: SUCI",
+		},
+		{
+			name: "GTPv2 OI",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"GTPv2"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"1"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "OI: supported",
+		},
+		{
+			name: "GTPv2 SI",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"GTPv2"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"1"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "SI: supported",
+		},
+		{
+			name: "GTPv2 DCNR",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"GTPv2"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"1"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "DCNR: supported",
+		},
+		{
+			name: "GTPv2 Cause",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"GTPv2"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"16"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "Cause: Request accepted",
+		},
+		{
+			name: "GTPv2 OI and Cause",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"GTPv2"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"1"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"16"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "OI: supported\\nCause: Request accepted",
+		},
+		{
+			name: "PFCP Cause",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"PFCP"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"1"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "Cause: Request accepted (success)",
+		},
+		{
+			name: "Diameter Result Code",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"DIAMETER"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"2001"}, // 24
+				{"0"}, // 25
+			},
+			want: "Cause: DIAMETER_SUCCESS",
+		},
+		{
+			name: "Diameter CC RequestType",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"DIAMETER"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"1"}, // 25
+			},
+			want: "CC-Request-Type: INITIAL_REQUEST",
+		},
+		{
+			name: "Diameter Result Code and CC RequestType",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"DIAMETER"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"2001"}, // 24
+				{"1"}, // 25
+			},
+			want: "Cause: DIAMETER_SUCCESS\\nCC-Request-Type: INITIAL_REQUEST",
+		},
+		{
+			name: "Empty Case",
+			args: [][]string{
+				{"1"},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},{""},
+				{"GTP"}, // 12
+				{"0"}, // 13
+				{"0"}, // 14
+				{"0"}, // 15
+				{"0"}, // 16
+				{"0"}, // 17
+				{"0"}, // 18
+				{"0"}, // 19
+				{"0"}, // 20
+				{"0"}, // 21
+				{"0"}, // 22
+				{"0"}, // 23
+				{"0"}, // 24
+				{"0"}, // 25
+			},
+			want: "",
+		},
 	}
 
-	t.Run(tests.name, func(t *testing.T) {
-		res := fmtOut.SetHeader(tests.args)
-		if len(res) == 0 {
-			t.Errorf("%s", res)
-		}
+	for _, v := range tests {
+		t.Run(v.name, func(t *testing.T) {
+			cmd := tshark.TsharkArgs{}
+			res := cmd.SetAnnotation(v.args)
 
-		for _, v := range res {
-			if v.Number == tests.want {
-				t.Errorf("Column Number is empty")
+			if res != v.want {
+				t.Errorf("The return value is not the expected value.\n %s", res)
 			}
-			if v.Time == tests.want {
-				t.Errorf("Column Time is empty")
-			}
-			if v.SrcAddr == tests.want {
-				t.Errorf("Column SrcAddr is empty")
-			}
-			if v.SrcPort == tests.want {
-				t.Errorf("Column SrcPort is empty")
-			}
-			if v.DstAddr == tests.want {
-				t.Errorf("Column DstAddr is empty")
-			}
-			if v.DstPort == tests.want {
-				t.Errorf("Column DstPort is empty")
-			}
-			if v.Protocol == tests.want {
-				t.Errorf("Column Protocol is empty")
-			}
-			if v.Message == tests.want {
-				t.Errorf("Column Message is empty")
-			}
-			if v.Checksum == tests.want {
-				t.Errorf("Column Checksum is empty")
-			}
-		}
-	})
+		})
+	}
 }
