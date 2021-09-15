@@ -15,7 +15,7 @@ func TestValidationConfig(t *testing.T) {
 	type Tests struct {
 		name string
 		args application
-		want string
+		want error
 	}
 
 	tests := []Tests{
@@ -26,34 +26,34 @@ func TestValidationConfig(t *testing.T) {
 				wireshark: "default",
 				plantuml:  cfg.PlantumlLongPath,
 			},
-			want: "",
+			want: nil,
 		},
 		{
-			name: "w/o Java",
+			name: "Error Case w/o Java",
 			args: application{
 				java:      "",
 				wireshark: "default",
 				plantuml:  cfg.PlantumlLongPath,
 			},
-			want: "",
+			want: nil,
 		},
 		{
-			name: "w/o Wireshark",
+			name: "Error Case w/o Wireshark",
 			args: application{
 				java:      "default",
 				wireshark: "",
 				plantuml:  cfg.PlantumlLongPath,
 			},
-			want: "",
+			want: nil,
 		},
 		{
-			name: "w/o PlantUML",
+			name: "Error Case w/o PlantUML",
 			args: application{
 				java:      "default",
 				wireshark: "default",
 				plantuml:  "",
 			},
-			want: "",
+			want: nil,
 		},
 	}
 
@@ -62,7 +62,17 @@ func TestValidationConfig(t *testing.T) {
 			cfg.Param.Profile.Path.Java = v.args.java
 			cfg.Param.Profile.Path.Wireshark = v.args.wireshark
 			cfg.Param.Profile.Path.Plantuml = v.args.plantuml
-			cfg.ValidationConfig()
+
+			switch(v.name) {
+				case "Normal Case":
+					if err := cfg.ValidationConfig(); err != nil {
+						t.Errorf("%s", err)
+					}
+				default:
+					if err := cfg.ValidationConfig(); err == nil {
+						t.Errorf("%s", err)
+					}				
+			}
 		})
 	}
 }

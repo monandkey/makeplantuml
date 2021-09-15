@@ -85,6 +85,9 @@ func (c configBaseUser) Writing() error {
 	return nil
 }
 
-func (c *configBaseUser) Validate() {
-	cfg.ValidationConfig()
+func (c *configBaseUser) Validate() error {
+	if err := cfg.ValidationConfig(); err != nil {
+		return err
+	}
+	return nil
 }

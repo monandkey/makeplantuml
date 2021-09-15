@@ -70,28 +70,21 @@ func validationPlantuml() error {
 	return nil
 }
 
-func ValidationConfig() {
-	var count = 0
-	const (
-		errMsg string = "does not exist in the specified location."
-	)
+func ValidationConfig() error {
+	const errMsg string = "does not exist in the specified location."
 
 	if err := validationJava(); err != nil {
-		fmt.Println("Error: Java " + errMsg)
-		count++
+		return errors.New("Error: Java " + errMsg)
 	}
 
 	if err := validationWireshark(); err != nil {
-		fmt.Println("Error: Wireshark " + errMsg)
-		count++
+		return errors.New("Error: Wireshark " + errMsg)
 	}
 
 	if err := validationPlantuml(); err != nil {
-		fmt.Println("Error: PlantUML " + errMsg)
-		count++
+		return errors.New("Error: PlantUML " + errMsg)
 	}
 
-	if count == 0 {
-		fmt.Println("OK")
-	}
+	fmt.Println("OK")
+	return nil
 }
