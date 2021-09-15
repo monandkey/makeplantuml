@@ -40,7 +40,9 @@ func init() {
 		use = user.ConfigUserSelection()
 
 		if initConfig.validation {
-			use.Validate()
+			if err := use.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}
 
